@@ -6,4 +6,3 @@ Group Number: 20
 Problem Assigned: Problem B - (JP Morgan)
 
 Group Members: Vishal Chavan, Xinwei Fan, Shuqi Wang, Jieli He
-
