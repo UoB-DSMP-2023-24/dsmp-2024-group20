@@ -11,7 +11,7 @@ lob = []
 with open("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02LOBs.txt", 'r') as file:
     for i, line in enumerate(file):
         lob.append(list(line.split('[[')))
-        if i == 99999:
+        if i == 30000:
             break
 #%%
 import ast
@@ -46,7 +46,7 @@ for line in lob:
             asks.append(dt)
             time.append(line[0].split(',')[0][1:])
             n.append(len(dt))
-            m_price.append(bids[len(bids)-1][0][0])
+            m_price.append(asks[len(asks)-1][0][0])
     except Exception as e:
         print(f"Error processing line: {line}. Error: {e}")
 asksdf = pd.DataFrame({'time':time,
@@ -60,5 +60,5 @@ df['market_price'] = (df['max_bid']+df['min_ask'])/2
 tapes = pd.read_csv("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02tapes.csv",
                     nrows=999)
 #%%
-df['market_price'].to_csv("market_price.csv")
+df[['max_bid','min_ask']].to_csv("maxmin.csv")
 #%%
