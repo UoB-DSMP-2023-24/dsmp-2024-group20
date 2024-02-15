@@ -1,0 +1,5 @@
+action:
+learn about ARIMA model
+extract more lob features
+
+Our teacher will value more about how to make decisions in our project.
