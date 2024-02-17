@@ -1,4 +1,9 @@
 action:
+discuss how to clean our data -> try them in model
+ask TA for some recommendations about model selection
+learn how to create branch in git
+
+plan:
 learn about ARIMA model
 extract more lob features
 
