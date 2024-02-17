@@ -55,3 +55,4 @@ df['order_book_imbalance'] = (df['bid_depth_size'] - df['ask_depth_size']) / (df
 df['bid_cumulative_depth'] = df['bid_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 df['ask_cumulative_depth'] = df['ask_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 
+df.to_csv('UoB_Set01_2025-01-02LOBs_features.csv', index=False)
