@@ -9,7 +9,7 @@ import pandas as pd
 
 #%%
 lob = []
-with open("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02LOBs.txt", 'r') as file:
+with open("/Users/fanxinwei/Desktop/code/UoB_Set01_2025-01-02LOBs.txt", 'r') as file:
     for i, line in enumerate(file):
         lob.append(list(line.split('[[')))
         if i == 73500:
@@ -66,7 +66,7 @@ asksdf = pd.DataFrame({'time':time,
 df = pd.merge(bidsdf,asksdf,on='time',how='outer').dropna()
 df['market_price'] = (df['max_bid']+df['min_ask'])/2
 #%%
-tapes = pd.read_csv("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02tapes.csv",
+tapes = pd.read_csv("/Users/fanxinwei/Desktop/code/UoB_Set01_2025-01-02tapes.csv",
                     nrows=999)
 #%%
 #df[['max_bid','min_ask']].to_csv("maxmin.csv")
