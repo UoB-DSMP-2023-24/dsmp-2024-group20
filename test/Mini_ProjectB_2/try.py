@@ -1,0 +1,1 @@
+def read_split_txtData(file_path, word_adjusted,  )
