@@ -6,10 +6,11 @@ This is a temporary script file.
 """
 
 import pandas as pd
-
+import json
+config = json.load(open("config.json"))
 #%%
 lob = []
-with open("/Users/fanxinwei/Desktop/code/UoB_Set01_2025-01-02LOBs.txt", 'r') as file:
+with open(config['path']['LOB_test1'], 'r') as file:
     for i, line in enumerate(file):
         lob.append(list(line.split('[[')))
         if i == 73500:
@@ -66,7 +67,7 @@ asksdf = pd.DataFrame({'time':time,
 df = pd.merge(bidsdf,asksdf,on='time',how='outer').dropna()
 df['market_price'] = (df['max_bid']+df['min_ask'])/2
 #%%
-tapes = pd.read_csv("/Users/fanxinwei/Desktop/code/UoB_Set01_2025-01-02tapes.csv",
+tapes = pd.read_csv(config['path']['Tapes_test1'],
                     nrows=999)
 #%%
 #df[['max_bid','min_ask']].to_csv("maxmin.csv")
