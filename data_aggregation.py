@@ -33,7 +33,7 @@ df = pd.read_csv(file_name)
 # 可以根据需要添加新的特征和聚合规则
 aggregation_rules = {
     'avg_price': 'mean',  # 假设 avg_price 需要求平均值
-    #'max_bid': 'max',  # 假设 max_bid 需要求最大值
+    'max_bid': 'max',  # 假设 max_bid 需要求最大值
 
 }
 aggregated_df = aggregate_data(df, 'time', aggregation_rules,5)
