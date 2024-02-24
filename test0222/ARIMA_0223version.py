@@ -8,7 +8,7 @@
     :param AddtheDate: control whether to add the date column to the dataframe
     :return data: type: pd.DataFrame; data['time']: Year-Month-Day Hour:Minute:second (!! the type of second is float)
 
-
+……
 
 """
 
@@ -131,7 +131,7 @@ agg_wavg = aggregate_data(wavg_tapesprice, second_column='timestamp', aggregatio
 ## Converts a timestamp to a time
 
 ### test !!!!!!!!!!!!
-filename = ['2025-01-02']
+filename = ['2025-01-02'] ## 这个和 读取文件的返回值不一样
 ## -------------------------
 def timestamp_to_time(data, filenames, start_time=[8, 0, 0]):
     """
@@ -178,14 +178,18 @@ adf_result_agg = ADFtest(agg_wavg_time['weighted_avg_price'])
 #%%
 ## difference : agg_wavg dataset
 agg_wavg_time['price_diff1'] = agg_wavg_time['weighted_avg_price'].diff()
+agg_wavg_time['price_diff2'] = agg_wavg_time['weighted_avg_price'].diff().diff()
 adf_result_agg_diff1 = ADFtest(agg_wavg_time['price_diff1'].dropna())
+adf_result_agg_diff2 = ADFtest(agg_wavg_time['price_diff2'].dropna())
+## 对比之后，选择一阶差分
+
 ### 使用.dropna()移除由于差分产生的任何NaN值.
 ### 例如： data_diff.dropna()
 #%%
 ## split the data:  train, val, test
 
 # df = pd.DataFrame(wavg_tapesprice[['timestamp', 'weighted_avg_price']])
-df =pd.DataFrame(agg_wavg_time[['time_window', 'weighted_avg_price', 'price_diff1', 'time']])
+df =pd.DataFrame(agg_wavg_time[['time_window', 'weighted_avg_price', 'price_diff1', 'time']].dropna())
 
 train_size = int(len(df)*0.8)
 val_size = train_size + int(len(df)*0.1)
@@ -195,13 +199,13 @@ val = df[train_size:val_size]
 test = df[val_size:]
 
 ## --------------------------------------------------
-def set_timeindex(dataset):
-    # dataset.set_index('time_window', inplace=True)
-    dataset.set_index('time', inplace=True)
-    return dataset
-# set_timeindex(train)
-# set_timeindex(val)
-# set_timeindex(test)
+# def set_timeindex(dataset):
+#     # dataset.set_index('time_window', inplace=True)
+#     dataset.set_index('time', inplace=True)  ## inplace = True 在原数据上进行
+#     return dataset
+# # set_timeindex(train)
+# # set_timeindex(val)
+# # set_timeindex(test)
 
 
 ## test
@@ -264,20 +268,23 @@ plt.show()
 ##############################################################################
 ##############################################################################
 # 使用 auto_arima 自动寻找最佳 ARIMA 模型
-dataset = agg_wavg_time[['time', 'price_diff1']].dropna(inplace=False).set_index('time', inplace=False)
-## inplace = False 在原数据上进行
+# dataset = agg_wavg_time[['time', 'price_diff1']].dropna(inplace=False).set_index('time', inplace=False)
+## inplace = False 不在原数据上进行
+
+
+##
+dataset = train.set_index('time', inplace=False)[['price_diff1']]
 
 model_auto = pm.auto_arima(dataset, start_p=0, start_q=0,
                       test='adf',  # 使用ADF测试确定'd'
-                      max_p=3, max_q=3,  # 设置p和q的最大值
+                      max_p=9, max_q=9,  # 设置p和q的最大值
                       m=1,  # 数据的季节性周期
                       d=None,  # 让模型自动确定最优的d
                       seasonal=False,  # 数据不包含季节性成分
-                      stepwise=True,  # 使用逐步算法
+                      stepwise=False,  # 使用逐步算法
                       suppress_warnings=True,  # 抑制警告信息
                       information_criterion='aic',  # 使用AIC选择最佳模型
                       trace=True)  # 打印搜索过程
-model_auto_fit = model_auto.fit
 # 输出模型摘要
 print(model_auto.summary())
 
@@ -294,34 +301,40 @@ print(model_auto.summary())
 ##############################################################################
 #%%
 ## 预测 Forecast  n_periods个点
-n_periods = 8000
-fc, confint = model_1.predict(n_periods=n_periods, return_conf_int=True)
-index_of_fc = np.arange(len(wavg_tapesprice['weighted_avg_price']), len(wavg_tapesprice['weighted_avg_price'])+n_periods)
+n_periods = len(test)
+fc, confint = model_auto.predict(n_periods=n_periods, return_conf_int=True)
+fc_df = pd.DataFrame(fc, columns=['forecast'])
+index_of_fc = test['time']
+fc_df = fc_df.set_axis(index_of_fc, axis='index')
+
+# fc, confint = model_auto.predict(n_periods=n_periods, return_conf_int=True)
+# fc_df = pd.DataFrame(fc, index=test['time'], columns=['forecast'])
 
 ##############################################################################
 #%%
 # 绘图  plotting
 # 数据  make series
-fc_series = pd.Series(fc, index=index_of_fc)
+# fc_series = pd.Series(fc, index=index_of_fc)
 lower_series = pd.Series(confint[:, 0], index=index_of_fc)
 upper_series = pd.Series(confint[:, 1], index=index_of_fc)
 
 #%%
 
-# 读取文件
-column_names = ['timestamp', 'price', 'quantity']
-file_path = 'E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/Tapes/UoB_Set01_2025-01-03tapes.csv'
-tapesprice_new = pd.read_csv(file_path, header=None, names=column_names, usecols=[0, 1, 2])
-wavg_tapesprice_new = wavg(tapesprice_new)
+# # 读取文件
+# column_names = ['timestamp', 'price', 'quantity']
+# file_path = 'E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/Tapes/UoB_Set01_2025-01-03tapes.csv'
+# tapesprice_new = pd.read_csv(file_path, header=None, names=column_names, usecols=[0, 1, 2])
+# wavg_tapesprice_new = wavg(tapesprice_new)
 
 #%%
 ##
-plt.plot(wavg_tapesprice_new['weighted_avg_price'].iloc[:18000])
-plt.plot(fc_series, color='red', label='fc_Tapes')
-plt.fill_between(lower_series.index,
-                 lower_series,
-                 upper_series,
-                 color='k', alpha=.15)
+test_ = pd.DataFrame(test.set_index('time', inplace=False)['price_diff1'])
+plt.plot(test_['price_diff1'])
+plt.plot(fc_df, color='red', label='fc_Tapes')
+# plt.fill_between(lower_series.index,
+#                  lower_series,
+#                  upper_series,
+#                  color='k', alpha=.15)
 
-plt.title("Final Forecast of WWW Usage")
+plt.title("Final Forecast")
 plt.show()
