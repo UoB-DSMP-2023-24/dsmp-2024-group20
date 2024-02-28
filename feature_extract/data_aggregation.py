@@ -1,9 +1,10 @@
-#%%
+# %%
 import numpy as np
 import pandas as pd
+import time
 
 
-def aggregate_data(df, second_column, aggregation_rules,second):
+def aggregate_data(df, second_column, aggregation_rules, second):
     """
     聚合数据函数。
 
@@ -25,9 +26,8 @@ def aggregate_data(df, second_column, aggregation_rules,second):
     return aggregated_df
 
 
-
-#%%
-file_name = "UoB_Set01_2025-01-02LOBs.csv"
+# %%
+file_name = "feature_extract/UoB_Set01_2025-01-02LOBs.csv"
 df = pd.read_csv(file_name)
 # 定义聚合规则，例如: {'feature1': 'mean', 'feature2': 'sum'}
 # 可以根据需要添加新的特征和聚合规则
@@ -36,7 +36,8 @@ aggregation_rules = {
     'max_bid': 'max',  # 假设 max_bid 需要求最大值
 
 }
-aggregated_df = aggregate_data(df, 'time', aggregation_rules,5)
 
-
-
+for i in range(2, 6):
+    aggregated_df = aggregate_data(df, 'time', aggregation_rules, i)
+    aggregated_df.to_csv('feature_extract/time_window_outputs/2025-01-02LOBs_' + str(i)
+                         + '_seconds.csv', index=False)
