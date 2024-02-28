@@ -36,7 +36,7 @@ result_df = pd.DataFrame(data)
 result_df.sort_values(by='date', inplace=True)
 
 try:
-    result_df.to_csv('/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/ARIMA/avg_data.csv', index=False)
+    result_df.to_csv('/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/arima/avg_data.csv', index=False)
     print("数据保存成功！")
 except Exception as e:
     print("数据保存失败:", e)
