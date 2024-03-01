@@ -1,0 +1,6 @@
+action:
+share ideas about lob features and implement of ARIMA
+
+plan:
+visualize lob features and find its relationship between market price
+fit useful lob features to ARIMA or other models

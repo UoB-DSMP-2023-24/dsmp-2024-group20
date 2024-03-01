@@ -6,18 +6,13 @@ This is a temporary script file.
 """
 
 import pandas as pd
-import os
 #%%
-file_path = "C:/桌面/learning/s2/mini/JPMorgan_Set01/LOBs/UoB_Set01_2025-01-02LOBs.txt"
 lob = []
-# 使用os.path.splitext分割文件名和扩展名
-filename_with_extension = os.path.basename(file_path)
-filename_without_extension, _ = os.path.splitext(filename_with_extension)
-new_filename = filename_without_extension + ".csv"
-
-with open(file_path, 'r') as file:
+with open("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02LOBs.txt", 'r') as file:
     for i, line in enumerate(file):
         lob.append(list(line.split('[[')))
+        if i == 30000:
+            break
 #%%
 import ast
 bids = []
@@ -60,12 +55,10 @@ asksdf = pd.DataFrame({'time':time,
                        "min_ask":m_price})
 #%%
 df = pd.merge(bidsdf,asksdf,on='time',how='outer').dropna()
-df['avg_price'] = (df['max_bid']+df['min_ask'])/2
+df['market_price'] = (df['max_bid']+df['min_ask'])/2
 #%%
-# tapes = pd.read_csv("C:/桌面/learning/s2/mini/JPMorgan_Set01/LOBs/UoB_Set01_2025-01-02LOBs.txt",
-#                     nrows=999)
+tapes = pd.read_csv("C:/Users/Vishal Chavan/Desktop/Uni/subjects/group project/UoB_Set01_2025-01-02tapes.csv",
+                    nrows=999)
 #%%
-df[['time','bid_price','max_bid','ask_price','min_ask','avg_price']].to_csv(new_filename, index=False)
-
+df[['max_bid','min_ask']].to_csv("maxmin.csv")
 #%%
-
