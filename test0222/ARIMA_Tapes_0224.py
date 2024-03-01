@@ -149,7 +149,8 @@ plt.show()
 
 
 #%%
-## 图片的线不对劲
+## ACF & PACF 图像
+## 图片的线不对劲-- 模块有点问题， 不影响大局
 lags = 40
 y = agg_df[['time', 'diff1']].dropna().set_index('time', inplace=False)
 plt.figure(figsize=(12, 6))
