@@ -131,7 +131,7 @@ agg_wavg = aggregate_data(wavg_tapesprice, second_column='timestamp', aggregatio
 ## Converts a timestamp to a time
 
 ### test !!!!!!!!!!!!
-filename = ['2025-01-02'] ## 这个和 读取文件的返回值不一样
+filename = ['2025-01-02'] ## 这个和 读取文件的返回值的名字 不一样
 ## -------------------------
 def timestamp_to_time(data, filenames, start_time=[8, 0, 0]):
     """
@@ -146,6 +146,9 @@ def timestamp_to_time(data, filenames, start_time=[8, 0, 0]):
         data['time'] = data['time'].apply(lambda x: x.replace(year=int(filename[:4]),
                                                               month=int(filename[5:7]),
                                                               day=int(filename[8:])))
+        # data['time'] = data['time'].apply(lambda x: x.replace(year=int(filename[10:14]),
+        #                                                       month=int(filename[15:17]),
+        #                                                       day=int(filename[18:20])))
         data['time'] += Timedelta(hours=start_time[0], minutes=start_time[1], seconds=start_time[2])
     return data
 
