@@ -208,6 +208,8 @@ agg_ask = aggregate_data(wavg_ask, second_column='timestamp_ask', aggregation_ru
 
 #%%
 ## Converts a timestamp to a time
+## 将时间戳转化成时间
+
 ## The London Stock Exchange opens at 8:00 a.m. UK time and closes at 4:30 p.m.
 ### with the market closed from 12:00 to 12:02 noon.
 ## 伦敦股票交易市场：8:00开盘,16:30收盘。12:00-12:02是休息时间。每天交易时长为8小时28分钟。
