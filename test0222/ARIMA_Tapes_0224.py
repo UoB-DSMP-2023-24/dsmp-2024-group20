@@ -166,7 +166,7 @@ plt.show()
 
 df_2 =agg_df[['time', 'price', 'diff1']].dropna()
 
-train_size = int(len(df_2)*0.998)
+train_size = int(len(df_2)*0.999)
 # val_size = train_size + int(len(df_2)*0.1)
 
 train = df_2[:train_size]

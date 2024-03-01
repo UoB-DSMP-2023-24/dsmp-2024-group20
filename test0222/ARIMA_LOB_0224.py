@@ -62,17 +62,18 @@ def read_LOBtxt(directory):
 #         LOB_list = LOB_list.append(ast.literal_eval(line))
 
 #%%
-# LOB_list, file_names_lob = read_LOBtxt(file_path)
-LOB_list3, file_names3 = read_LOBtxt(file_path)
+## save the List
+### LOB_list, file_names_lob = read_LOBtxt(file_path)
+# LOB_list3, file_names3 = read_LOBtxt(file_path)
+#
+# import csv
+# with open("LOB_list2.csv", "w", newline='') as file:
+#     # 创建一个 CSV writer 对象
+#     csv_writer = csv.writer(file)
+#     # 写入列表中的数据行
+#     csv_writer.writerows(LOB_list3)
 
-import csv
-with open("LOB_list2.csv", "w", newline='') as file:
-    # 创建一个 CSV writer 对象
-    csv_writer = csv.writer(file)
-    # 写入列表中的数据行
-    csv_writer.writerows(LOB_list3)
-
-# df_bid.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/dataset5_bid.csv', index=False)
+#### df_bid.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/dataset5_bid.csv', index=False)
 
 ## ----------------------------------
 #%%
@@ -111,8 +112,8 @@ def split_txtdata(dataset:list, filenames):
     print('The names of the keys are : ', dataset.keys())
     return dataset
 
-LOB_list = LOB_list2
-dataset_bidask = split_txtdata(LOB_list)
+LOB_list = LOB_list3
+dataset_bidask = split_txtdata(LOB_list, file_names)
 
 #%%
 ## 将dataset_bidask 转化成两个 数据框
@@ -143,3 +144,4 @@ def bidaskList_to_dataframe(dataset_bidask):
 df_bid, df_ask = bidaskList_to_dataframe(dataset_bidask)
 
 #%%
+
