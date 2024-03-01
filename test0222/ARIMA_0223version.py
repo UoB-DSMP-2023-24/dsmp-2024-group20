@@ -92,10 +92,10 @@ def wavg(data_csv):
     data_csv['wavg_plus_price'] = data_csv['price'] * data_csv['quantity']
     df = data_csv.groupby(['timestamp']).agg({'wavg_plus_price': 'sum', 'quantity': 'sum'}).reset_index()
     df['weighted_avg_price'] = df['wavg_plus_price'] / df['quantity']
-    if 'time' in data_csv.keys():
-        df['time'] = data_csv['time']
-    if 'date' in data_csv.keys():
-        df['date'] = data_csv['date']
+    # if 'time' in data_csv.keys():
+    #     df['time'] = data_csv['time']
+    # if 'date' in data_csv.keys():
+    #     df['date'] = data_csv['date']
     return df
 
 wavg_tapesprice = wavg(data_csv)

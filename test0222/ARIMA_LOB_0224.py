@@ -11,16 +11,7 @@ def add_quotes_to_specific_word(s, word):
     pattern = r'\b' + re.escape(word) + r'\b'
     return re.sub(pattern, f"'{word}'", s)
 
-# # 测试字符串
-# test_str = "[0.000, Exch0, [['bid', []], ['ask', []]]]"
-# # 转换字符串，只为"Exch0"添加引号
-# corrected_str = add_quotes_to_specific_word(test_str, 'Exch0')
-# print(corrected_str)
-
 ## list.insert(position=2, data='new data')
-
-test_list = [0.0, 'Exch0', [['bid', []], ['ask', []]]]
-
 def insert_date(list, position, date):
     # date = pd.to_datetime(file_name[10:20])
     # date = file_name[10:20]
@@ -64,14 +55,14 @@ def read_LOBtxt(directory):
 #%%
 ## save the List
 ### LOB_list, file_names_lob = read_LOBtxt(file_path)
-# LOB_list3, file_names3 = read_LOBtxt(file_path)
+LOB_list, file_names = read_LOBtxt(file_path)
 #
 # import csv
-# with open("LOB_list2.csv", "w", newline='') as file:
+# with open("LOB_list.csv", "w", newline='') as file:
 #     # 创建一个 CSV writer 对象
 #     csv_writer = csv.writer(file)
 #     # 写入列表中的数据行
-#     csv_writer.writerows(LOB_list3)
+#     csv_writer.writerows(LOB_list)
 
 #### df_bid.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/dataset5_bid.csv', index=False)
 
@@ -112,7 +103,6 @@ def split_txtdata(dataset:list, filenames):
     print('The names of the keys are : ', dataset.keys())
     return dataset
 
-LOB_list = LOB_list3
 dataset_bidask = split_txtdata(LOB_list, file_names)
 
 #%%
@@ -144,4 +134,29 @@ def bidaskList_to_dataframe(dataset_bidask):
 df_bid, df_ask = bidaskList_to_dataframe(dataset_bidask)
 
 #%%
+## calculate the weighted_price
+### wavg_price: weight average price based on quantity
+def wavg(data_csv, timestamp, price, quantity):
+    '''
+
+    :param data_csv: dataframe
+    :param timestamp: the column's name
+    :param price: the column's name
+    :param quantity: the column's name
+    :return:
+    '''
+    ### or using keys() to get these column's names
+    df = pd.DataFrame()
+    data_csv['wavg_plus_price'] = data_csv[price] * data_csv[quantity]
+    df = data_csv.groupby([timestamp]).agg({'wavg_plus_price': 'sum', quantity: 'sum'}).reset_index()
+    df['wavg_price'] = df['wavg_plus_price'] / df[quantity]
+    return df
+
+# df_bid.keys()
+## (['timestamp_bid', 'bid_price', 'bid_quantity'], dtype='object')
+# df_ask.keys()
+## (['timestamp_ask', 'ask_price', 'ask_quantity'], dtype='object')
+
+wavg_bid = wavg(df_bid, 'timestamp_bid', 'bid_price', 'bid_quantity')
+wavg_ask = wavg(df_ask, 'timestamp_ask', 'ask_price', 'ask_quantity')
 
