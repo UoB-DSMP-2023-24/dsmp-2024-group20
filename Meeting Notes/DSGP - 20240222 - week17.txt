@@ -1,0 +1,3 @@
+plan:
+1. try different time periods to clean our data, test its performance in ARIMA
+2. try different lob features in ARIMA

@@ -1,0 +1,25 @@
+DSGP - 12022024
+
+Meeting minutes - 
+
+We got a basic idea of auto-correlation, auto-regression* and moving average system* from the book Trades, Quotes, and Prices: Financial Markets. We can use this to knowledge to create ARIMA1. Possibly use ARIMAX. We learned that we have to remove unit roots by smoothing the data to use ARIMA. We looked at some machine learning and stats models. But the problem calls for reinforcement learning and we want to use markov decision models to create implement our trading algorithm. Presented by Xinwei
+
+We discussed Markov decision models and how they work. This included presentation of definitions by Vishal using a maze as an example.
+
+We went through some important definitions related to LOB from the paper Limit Order Books, Cambridge University Press by Abergel et al. We looked at some mathematical modelling of LOBs - these included Agent-Based Models for Limit Order Books, Stigler, Zero-Intelligence, Order-driven Market Modelling. Presented by Shuqi
+
+We discussed the spoofing of data in limit order books and discussed how we can prevent it from affecting our models. For example, taking the first few limit orders based on number or extracting certain percentage beyond the market price or average values in ask and bid. Initiated by Vishal, discussed by Xinwei, Shuqi, Jieli
+
+Went through the paper DeepLOB: Deep Convolutional Neural Networks for Limit Order Books Zhang et al. which contained important imformation on LOBs and data labelling and the implementaion of a CNN. Presented by Jieli
+
+Researched various reinforcement learning methods to determine which ones to use in the future, and came up with a plan for next steps. By Vishal
+
+
+Next Steps:
+Study A3C system and understands it's basics. Check if it is viable to implement it. 
+Decide if we should determine trading strategies ourselves or learn them.
+Visualisation of data using the python code. 
+Cleaning and exploration of the dataset.
+Implement ARIMA1 system. 
+Choose the correct markov decision based reinforcement learning model. 
+Write or find a simulator that trades according to the signals.
