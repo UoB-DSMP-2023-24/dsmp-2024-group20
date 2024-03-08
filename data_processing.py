@@ -74,19 +74,23 @@ def before_agg_get_feature(df):
     df['bid_cumulative_depth'] = df['bid_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
     df['ask_cumulative_depth'] = df['ask_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 
+
     return df
 
 def after_agg_get_feature(df):
     df['avg_price'] = (df['max_bid'] + df['min_ask']) / 2
     df['avg_price_change'] = df['avg_price'] / df['avg_price'].shift(1) - 1
-    df['next_avg_price_change'] = (df['avg_price'].shift(-1)-df['avg_price'])/df['avg_price']
     df['bid_level_diff'] = df['max_bid'] / df['avg_price'] - 1
     df['ask_level_diff'] = df['min_ask'] / df['avg_price'] - 1
+    df['bid_ask_depth_diff'] = ((df['bid_cumulative_depth'] - df['ask_cumulative_depth'])/
+                                (df['bid_cumulative_depth'] + df['ask_cumulative_depth']))
+    df['next_avg_price_change'] = (df['avg_price'].shift(-1)-df['avg_price'])/df['avg_price']
+
     return df
 def mark_label(df,k,thresholds):
     #0:stay,1:up，2:down
-    df['m_minus'] = df['avg_price'].rolling(window=k).mean()
-    df['m_plus'] = df['avg_price'].shift(-k).rolling(window=k).mean()
+    # df['m_minus'] = df['avg_price'].rolling(window=k).mean()
+    df['m_plus'] = df['avg_price'].shift(-1).rolling(window=k, min_periods=1).mean().shift(-k+1)
     df['l_t'] = (df['m_plus'] - df['avg_price']) / df['avg_price']
     df['label'] = 0
     df.loc[df['l_t'] > thresholds, 'label'] = 1
@@ -103,6 +107,7 @@ file_paths = glob.glob(os.path.join(input_path, '*.txt'))  # 根据需要修改�
 aggregation_rules = {
     'max_bid': 'mean',  # 假设 max_bid 需要求最大
     'min_ask': 'mean',  # 假设 min_ask 需要求平均值
+    # 'bid_ask_depth_diff': 'mean',  # 假设 bid_ask_depth_diff 需要求平均值
 
     # 'next_avg_price_change': 'mean',
     # 'avg_price': 'mean',  # 假设 avg_price 需要求平均值
@@ -123,10 +128,9 @@ for file_path in file_paths:
     print("--------------Processing file:", original_file_name,"--------------")
     df = process_lob_file(file_path)
     df = before_agg_get_feature(df)
-
     df = aggregate_data(df, 'time', aggregation_rules,1)
     df = after_agg_get_feature(df)
-    df = mark_label(df,10,0.01)
+    df = mark_label(df,10,0.005)
     new_file_name = os.path.splitext(original_file_name)[0] + '.csv'
     # 3. 构建新的文件路径
     output_file_path = os.path.join(output_path, new_file_name)

@@ -23,7 +23,7 @@ torch.backends.cudnn.benchmark = False
 fig, ax = plt.subplots(figsize=(14, 7))
 df = pd.read_csv('process_data/UoB_Set01_2025-01-02LOBs.csv')
 df = df.dropna()
-df =df.iloc[:400]
+df =df.iloc[:500]
 # 绘制价格线
 ax.plot(df['time_window'], df['avg_price'], label='Price')
 
@@ -66,6 +66,9 @@ def create_sequences(input_data, target_data, sequence_length):
     return np.array(sequences), np.array(target_sequences)
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs):
+    best_loss = float('inf')  # 初始化最佳损失为无穷大
+    best_model = None  # 初始化最佳模型
+    best_epoch = 0  # 初始化最佳模型的训练轮次
     for epoch in range(num_epochs):
         model.train()
         train_loss = 0.0
@@ -80,23 +83,31 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         train_loss /= len(train_loader)
         # 验证过程
         model.eval()  # 将模型设置为评估模式
-        val_loss = 0.0
+        test_loss = 0.0
         correct = 0
         total = 0
         with torch.no_grad():  # 在验证过程中不计算梯度
             for X_val_batch, y_val_batch in val_loader:
                 y_val_pred = model(X_val_batch)
-                val_loss += criterion(y_val_pred, y_val_batch).item()
+                test_loss += criterion(y_val_pred, y_val_batch).item()
                 _, predicted = torch.max(y_val_pred.data, 1)
                 total += y_val_batch.size(0)
                 correct += (predicted == y_val_batch).sum().item()
 
         # 计算平均验证损失和准确率
-        val_loss /= len(val_loader)
-        val_accuracy = correct / total
+        test_loss /= len(val_loader)
+        test_accuracy = correct / total
 
-        print(
-            f'Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}')
+        if test_loss < best_loss:
+            best_epoch = epoch
+            best_loss = test_loss
+            best_model = model.state_dict()  # 保存最佳模型的状态字典
+            # 保存模型状态字典
+            torch.save(best_model, 'model/best_model.pth')
+
+        print(f'Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss:.4f}, '
+              f'Test Loss: {test_loss:.4f}, 'f'Test Accuracy: {test_accuracy:.4f}, '
+              f'Best Epoch: {best_epoch+1}')
 
 # 预测
 def predict(model, test_loader):
@@ -119,25 +130,26 @@ start_date = pd.to_datetime('2025-01-02 08:00:00')
 df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
 df.set_index('actual_datetime', inplace=True)
 feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change',
-            'bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']]
+            'bid_level_diff', 'ask_level_diff','bid_ask_depth_diff']]
 target=df['label']
 scaler = StandardScaler()
 
 # 对特征进行标准化
 scaled_features = scaler.fit_transform(feature)
-sequence_length = 5  # 可以根据需要调整这个值
+sequence_length = 10  # 可以根据需要调整这个值
 X, y = create_sequences(scaled_features, target.values, sequence_length)
 # 按顺序划分数据集
 train_size = int(len(X) * 0.8)
-X_train, X_temp = X[:train_size], X[train_size:]
-y_train, y_temp = y[:train_size], y[train_size:]
+X_train, X_test = X[:train_size], X[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
 
-test_size = int(len(X_temp) * 0.5)
-X_val, X_test = X_temp[:test_size], X_temp[test_size:]
-y_val, y_test = y_temp[:test_size], y_temp[test_size:]
+# test_size = int(len(X_temp) * 0.2)
+# X_val, X_test = X_temp[:test_size], X_temp[test_size:]
+# y_val, y_test = y_temp[:test_size], y_temp[test_size:]
 
-X_val_tensor = torch.tensor(X_val, dtype=torch.float32)
-y_val_tensor = torch.tensor(y_val, dtype=torch.long)
+# X_val_tensor = torch.tensor(X_val, dtype=torch.float32)
+# y_val_tensor = torch.tensor(y_val, dtype=torch.long)
+
 X_train_tensor = torch.tensor(X_train, dtype=torch.float)
 y_train_tensor = torch.tensor(y_train, dtype=torch.long)
 X_test_tensor = torch.tensor(X_test, dtype=torch.float)
@@ -148,15 +160,15 @@ batch_size = 64
 
 train_data = TensorDataset(X_train_tensor, y_train_tensor)
 test_data = TensorDataset(X_test_tensor, y_test_tensor)
-val_data = TensorDataset(X_val_tensor, y_val_tensor)
+# val_data = TensorDataset(X_val_tensor, y_val_tensor)
 
 train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size)
 test_loader = DataLoader(test_data, batch_size=batch_size)
-val_loader = DataLoader(val_data, batch_size=64)
+# val_loader = DataLoader(val_data, batch_size=64)
 
 
 #%%
-input_dim = X_train.shape[2] # 输入特征的维度，例如LOB中的9个特征
+input_dim = X_train.shape[2]
 hidden_dim = 100 # 隐藏层维度
 num_layers = 5 # LSTM层的数量
 output_dim =  3# 输出维度
@@ -168,11 +180,12 @@ criterion = nn.CrossEntropyLoss()  # 用于多分类问题
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 # 训练模型
-num_epochs = 5
-train_model(model, train_loader,val_loader,criterion, optimizer, num_epochs)
+num_epochs = 20
+train_model(model, train_loader,test_loader,criterion, optimizer, num_epochs)
 
 #%%
 # 测试模型性能# 此函数应该返回模型在测试集上的预测
+model.load_state_dict(torch.load('model/best_model.pth'))
 predictions = predict(model, test_loader)
 
 # 将输出的概率转换为类别索引
