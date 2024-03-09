@@ -100,8 +100,8 @@ def mark_label(df,k,thresholds):
 
 #%%
 # 指定文件夹路径
-input_path = 'C:/桌面/learning/s2/mini/JPMorgan_Set01/LOBs'
-output_path = 'process_data'
+input_path = '/Users/fanxinwei/Desktop/code/train_data/uob_mini_project/lob'
+output_path = 'output_data'
 # 获取文件夹内所有特定类型的文件，比如.txt文件
 file_paths = glob.glob(os.path.join(input_path, '*.txt'))  # 根据需要修改文件类型
 aggregation_rules = {
