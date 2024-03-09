@@ -33,3 +33,4 @@ for i in range(2, 6):
     result_map[i] = total_difference
 
 print(result_map)
+# {2: 593.3935179983455, 3: 693.8146862027932, 4: 818.0276881758489, 5: 928.3105017706541}
