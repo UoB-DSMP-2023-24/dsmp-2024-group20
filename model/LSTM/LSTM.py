@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import numpy as np
-from sklearn.metrics import confusion_matrix
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.metrics import classification_report
 import seaborn as sns
@@ -125,13 +125,13 @@ def predict(model, test_loader):
 df = pd.read_csv('output_data/UoB_Set01_2025-01-02LOBs.csv')
 df = df.dropna()
 # df = df.iloc[:5000]
-
 start_date = pd.to_datetime('2025-01-02 08:00:00')
 df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
 df.set_index('actual_datetime', inplace=True)
 feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change',
             'bid_level_diff', 'ask_level_diff','bid_ask_depth_diff']]
 target=df['label']
+
 scaler = StandardScaler()
 
 # 对特征进行标准化
@@ -180,7 +180,7 @@ criterion = nn.CrossEntropyLoss()  # 用于多分类问题
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 # 训练模型
-num_epochs = 20
+num_epochs = 10
 train_model(model, train_loader,test_loader,criterion, optimizer, num_epochs)
 
 #%%
@@ -229,4 +229,10 @@ plt.savefig('confusion_matrix.png')
 plt.show()
 
 print(classification_report(y_test_tensor, predicted_classes))
+
+precision = precision_score(y_test_tensor, predicted_classes.numpy(), average='macro')
+recall = recall_score(y_test_tensor, predicted_classes.numpy(), average='macro')
+f1 = f1_score(y_test_tensor, predicted_classes.numpy(), average='macro')
+
+print(f"Accuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1 Score: {f1}")
 
