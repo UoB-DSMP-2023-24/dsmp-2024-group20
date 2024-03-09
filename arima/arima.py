@@ -36,13 +36,17 @@ train = df.iloc[:int(N*0.8)]  # 训练集：除了最后N个观测点外的所�
 test = df.iloc[int(N*0.8):N]  # 测试集：最后N个观测点
 
 model = SARIMAX(train['l_t'],
-                exog=train[[ 'max_bid','min_ask','avg_price','avg_price_change','bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']],
+                exog=train[[ 'max_bid','min_ask','avg_price','avg_price_change','bid_level_diff',
+                             'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']],
                 order=(1, 0, 2),
                 seasonal_order=(2, 1, 0, 5))  # s需要根据您数据的季节性周期进行调整,1天=86400秒
 results = model.fit()
 
 # 进行预测，注意在做出预测时也需要提供相应时期的外生变量
-preds = results.forecast(steps=test.shape[0], exog=test[['max_bid','min_ask','avg_price','avg_price_change','bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']])
+preds = results.forecast(steps=test.shape[0], exog=test[['max_bid','min_ask','avg_price',
+                                                         'avg_price_change','bid_level_diff',
+                                                         'ask_level_diff', 'bid_cumulative_depth',
+                                                         'ask_cumulative_depth']])
 
 #%%
 preds_series = pd.Series(preds, index=test.index)
