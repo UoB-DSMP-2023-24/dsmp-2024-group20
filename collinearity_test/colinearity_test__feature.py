@@ -44,6 +44,8 @@ vif_data["feature"] = df.columns
 
 vif_data["VIF"] = [variance_inflation_factor(df.dropna().values, i) for i in range(len(df.columns))]
 
+
+
 print(vif_data)
 
 
