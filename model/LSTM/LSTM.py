@@ -187,7 +187,10 @@ train_model(model, train_loader,test_loader,criterion, optimizer, num_epochs)
 # 测试模型性能# 此函数应该返回模型在测试集上的预测
 model.load_state_dict(torch.load('model/best_model.pth'))
 predictions = predict(model, test_loader)
+print(predictions[:10])
+print(predictions.shape)
 
+#%%
 # 将输出的概率转换为类别索引
 _, predicted_classes = torch.max(torch.tensor(predictions), 1)
 

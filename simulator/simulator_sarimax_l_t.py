@@ -1,7 +1,7 @@
 import pandas as pd
 
 # 加载数据
-file_path = 'arima_prediction_comparison.csv'
+file_path = 'simulator/arima_prediction_comparison.csv'
 data = pd.read_csv(file_path)
 
 initial_funds = 10000
@@ -24,7 +24,7 @@ for index, row in data.iterrows():
 # Add the buy/sell points to the dataframe
 data['Action'] = buy_sell_points
 
-output_file_path = 'arima_prediction_with_trades.csv'
+output_file_path = 'simulator/arima_prediction_with_trades.csv'
 data.to_csv(output_file_path, index=False)
 
 # Calculate the value of remaining stocks at the last available price
