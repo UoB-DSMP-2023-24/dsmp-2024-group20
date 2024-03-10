@@ -1,3 +1,10 @@
+"""
+  当回归模型中出现两个或两个以上的自变量时，这些自变量往往会彼此相关，会提供彼此重复的信息。
+  多重共线性：当两个或者两个以上的自变量彼此相关时，则称回归模型中存在 多重共线性。
+    负面影响：    -1- 可能会使得回归结果变得混乱
+                -2- 可能对参数估计值的正负号产生影响 (比如，与预期相反)
+"""
+
 #%%
 import pandas as pd
 import numpy as np
@@ -48,9 +55,6 @@ vif_data["feature"] = df.columns
 ### VIF阈值 5 (或者10)
 
 vif_data["VIF"] = [variance_inflation_factor(df.dropna().values, i) for i in range(len(df.columns))]
-
-
-
 print(vif_data)
 
 #                   feature           VIF
@@ -67,29 +71,7 @@ print(vif_data)
 # 10  next_avg_price_change  1.335917e+00
 # 11                 m_plus  2.217258e+04
 # 12                    l_t  5.094513e+01
-
-
-#                   feature           VIF
-# 0             time_window  4.679049e+00
-# 1                 max_bid           inf
-# 2                 min_ask           inf
-# 3    bid_cumulative_depth  8.256610e+01
-# 4    ask_cumulative_depth  9.359427e+01
-# 5               avg_price           inf
-# 6        avg_price_change  1.240531e+00
-# 7          bid_level_diff           inf
-# 8          ask_level_diff           inf
-# 9      bid_ask_depth_diff  2.598293e+01
-# 10  next_avg_price_change  1.335917e+00
-# 11                 m_plus  2.217258e+04
-# 12                    l_t  5.094513e+01
-
-
-#%%
-# 条件指数（Condition Index）
-
-
-
+## 忽略 inf 值的结果
 
 #%%
 ## 显著性检验  -- 没有实操的价值
