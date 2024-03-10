@@ -179,6 +179,8 @@ wavg_ask = wavg(df_ask, 'timestamp_ask', 'ask_price', 'ask_quantity')
 # Out[151]: Index(['timestamp_bid', 'wavg_plus_price', 'bid_quantity', 'wavg_price'], dtype='object')
 
 #%%
+
+## Aggregation Data
 def aggregate_data(df, second_column, aggregation_rules,second):
     df['time_window'] = (df[second_column] // second) * second
     aggregated_df = df.groupby('time_window').agg(aggregation_rules).reset_index()
@@ -250,6 +252,7 @@ def ADFtest(timeseries):
     for key, value in dftest[4].items():
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
+
 
 adf_result_bid = ADFtest(agg_bid['wavg_price'])
 adf_result_ask = ADFtest(agg_ask['wavg_price'])
