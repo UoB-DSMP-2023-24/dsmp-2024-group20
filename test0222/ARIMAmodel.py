@@ -38,12 +38,16 @@ data_csv = read_csvfile_all3(directory_trytry)
 
 # data_csv.info
 ## timestamp  price  quantity
+
+#%%
+# ## 直接读取现有的数据
+# data_ask = pd.read_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOB_processed/LOB_ask/2025-01-02.csv')
+# data_bid = pd.read_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOB_processed/LOB_bid/2025-01-02.csv')
+
+
 #%%
 ##########################
 # 计算加权平均价格——按照数量加权
-# data_csv['wavg_tapesprice'] = data_csv['price'] * data_csv['quantity']
-# wavg_tapesprice = data_csv.groupby(['timestamp']).agg({'wavg_tapesprice': 'sum', 'quantity': 'sum'}).reset_index()
-# wavg_tapesprice['weighted_avg_price'] = wavg_tapesprice['wavg_tapesprice']/wavg_tapesprice['quantity']
 
 
 ## 计算加权平均价格——按照数量加权

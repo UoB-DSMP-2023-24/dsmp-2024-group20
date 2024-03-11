@@ -149,6 +149,11 @@ def bidaskList_to_dataframe(dataset_bidask):
 df_bid, df_ask = bidaskList_to_dataframe(dataset_bidask)
 
 #%%
+## 直接读取现有的数据
+data_ask = pd.read_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOB_processed/LOB_ask/2025-01-02.csv')
+data_bid = pd.read_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOB_processed/LOB_bid/2025-01-02.csv')
+
+#%%
 ## calculate the weighted_price
 ### wavg_price: weight average price based on quantity
 def wavg(data_csv, timestamp, price, quantity):
@@ -175,6 +180,8 @@ def wavg(data_csv, timestamp, price, quantity):
 wavg_bid = wavg(df_bid, 'timestamp_bid', 'bid_price', 'bid_quantity')
 wavg_ask = wavg(df_ask, 'timestamp_ask', 'ask_price', 'ask_quantity')
 
+wavg_bid2 = wavg(data_bid, 'timestamp', 'price', 'quantity')
+wavg_ask2 = wavg(data_ask, 'timestamp', 'price', 'quantity')
 # wavg_bid.keys()
 # Out[151]: Index(['timestamp_bid', 'wavg_plus_price', 'bid_quantity', 'wavg_price'], dtype='object')
 
@@ -190,6 +197,8 @@ aggregation_rules = {'wavg_price': 'mean'}
 agg_bid = aggregate_data(wavg_bid, second_column='timestamp_bid', aggregation_rules=aggregation_rules, second=5)
 agg_ask = aggregate_data(wavg_ask, second_column='timestamp_ask', aggregation_rules=aggregation_rules, second=5)
 
+agg_bid2 = aggregate_data(wavg_bid2, second_column='timestamp', aggregation_rules=aggregation_rules, second=5)
+agg_ask2 = aggregate_data(wavg_ask2, second_column='timestamp', aggregation_rules=aggregation_rules, second=5)
 # agg_bid.keys()
 # Out[153]: Index(['time_window', 'wavg_price'], dtype='object')
 
@@ -257,6 +266,8 @@ def ADFtest(timeseries):
 adf_result_bid = ADFtest(agg_bid['wavg_price'])
 adf_result_ask = ADFtest(agg_ask['wavg_price'])
 
+adf_result_bid2 = ADFtest(agg_bid2['wavg_price'])
+adf_result_ask2 = ADFtest(agg_ask2['wavg_price'])
 ## bid-- 不需要差分
 # Results of Augmented Dickey-Fuller Test:
 # Test Statistic                  -19.382527
@@ -270,7 +281,7 @@ adf_result_ask = ADFtest(agg_ask['wavg_price'])
 
 ## ask-- 不需要差分
 # Results of Augmented Dickey-Fuller Test:
-# Test Statistic                -1.132689e+01
+# Test Statistic                -1.132689e+01  这里e+01是10^1
 # p-value                        1.137648e-20
 # #Lags Used                     1.900000e+01
 # Number of Observations Used    6.100000e+03
@@ -279,11 +290,55 @@ adf_result_ask = ADFtest(agg_ask['wavg_price'])
 # Critical Value (10%)          -2.567022e+00
 # dtype: float64
 
+## 直接读取的bid文件不需要差分
+# Results of Augmented Dickey-Fuller Test:
+# Test Statistic                -7.674703e+00
+# p-value                        1.559954e-11
+# #Lags Used                     3.400000e+01
+# Number of Observations Used    6.085000e+03
+# Critical Value (1%)           -3.431425e+00
+# Critical Value (5%)           -2.862015e+00
+# Critical Value (10%)          -2.567023e+00
+# dtype: float64
+
+## 直接读取的ask文件不需要差分
+# Results of Augmented Dickey-Fuller Test:
+# Test Statistic                -1.219069e+01   这里科学计数法 e+01
+# p-value                        1.287862e-22
+# #Lags Used                     2.000000e+01
+# Number of Observations Used    6.099000e+03
+# Critical Value (1%)           -3.431423e+00
+# Critical Value (5%)           -2.862014e+00
+# Critical Value (10%)          -2.567022e+00
+# dtype: float64
+#%%
+def timestamp_to_time(data, filenames, start_time=[8, 0, 0]):
+    """
+    Converts a timestamp to a time
+    :param data: pandas dataframe with timestamps 【！】 timestamp column's name : "time_window"
+    :param filenames: come from the list of dates
+    :param start_time: list; default value [8, 0, 0]
+    :return: pandas dataframe with time: YYYY-MM-DD HH:mm:ss.ms
+    """
+    for filename in filenames:
+        data['time'] = pd.to_datetime(data['time_window'], unit='s')
+        data['time'] = data['time'].apply(lambda x: x.replace(year=int(filename[:4]),
+                                                              month=int(filename[5:7]),
+                                                              day=int(filename[8:])))
+        data['time'] += Timedelta(hours=start_time[0], minutes=start_time[1], seconds=start_time[2])
+    return data
+
+filename = ['2025-01-02']
+
+agg_bid2 = timestamp_to_time(agg_bid2, filename)
+agg_ask2 = timestamp_to_time(agg_ask2, filename)
+
 #%%
 ## ACF & PACF 图像
 ## 图片的线不对劲-- 模块有点问题， 不影响大局
-agg_df = agg_bid
-# agg_df = agg_ask
+agg_df = agg_bid2
+# agg_df = agg_ask2
+
 lags = 30
 
 y = agg_df[['time_window', 'wavg_price']].dropna().set_index('time_window', inplace=False)
@@ -299,33 +354,37 @@ plt.show()
 #%%
 ## split the data
 
-df_2 =agg_bid[['time_window', 'wavg_price']].dropna()
-# df_2 =agg_ask[['time_window', 'wavg_price']].dropna()
+df_2 =agg_bid2.dropna()
+# df_2 =agg_ask2.dropna()
 
-train_size = int(len(df_2)*0.999)
+
+train_size = int(len(df_2)*0.99)
 # val_size = train_size + int(len(df_2)*0.1)
 
 train = df_2[:train_size]
 # val = df_2[train_size:val_size]
 test = df_2[train_size:]
 
-#%%
-dataset = train.set_index('time_window', inplace=False)['wavg_price']
 
+
+#%%
+dataset = train.set_index('time', inplace=False)['wavg_price']
+
+#%%
 model_auto = pm.auto_arima(dataset, start_p=0, start_q=0,
                       test='adf',  # 使用ADF测试确定'd'
-                      max_p=9, max_q=9,  # 设置p和q的最大值
+                      max_p=5, max_q=5,  # 设置p和q的最大值
                       m=1,  # 数据的季节性周期
-                      d=None,  # 让模型自动确定最优的d
+                      # d=None,  # 让模型自动确定最优的d
                       seasonal=False,  # 数据不包含季节性成分
-                      stepwise=True,  # 使用逐步算法
+                      stepwise=False,  # 使用逐步算法？
                       suppress_warnings=True,  # 抑制警告信息
                       information_criterion='aic',  # 使用AIC选择最佳模型
                       trace=True)  # 打印搜索过程
 # 输出模型摘要
 print(model_auto.summary())
 
-### AIC和BIC值太高了
+### AIC和BIC值太高了———————— 绝对值意义不大， 要看不同模型之间的相对值
 ### 需要尝试重新处理数据?
 ### 要不尝试给数据加上 年月日 时分秒？
 #%%
@@ -337,19 +396,21 @@ index_of_fc = test['time']
 fc_df = fc_df.set_axis(index_of_fc, axis='index')
 
 #%%
+# ## 调整轴
+# lower_series = pd.Series(confint[:, 0], index=index_of_fc)
+# upper_series = pd.Series(confint[:, 1], index=index_of_fc)
 
-##
-lower_series = pd.Series(confint[:, 0], index=index_of_fc)
-upper_series = pd.Series(confint[:, 1], index=index_of_fc)
-
-##
-test_ = pd.DataFrame(test.set_index('time_window', inplace=False)['wavg_price'])
-plt.plot(test_['wavg_price'])
-plt.plot(fc_df, color='red', label='fc_Tapes')
-# plt.fill_between(lower_series.index,
-#                  lower_series,
-#                  upper_series,
-#                  color='k', alpha=.15)
-
-plt.title("Final Forecast")
+#%%
+test.set_index('time', inplace=True)
+train.set_index('time', inplace=True)
+#%%
+plt.plot(train['wavg_price'][-800:], label='train')
+plt.plot(test['wavg_price'], label='test', color='orange')
+plt.plot(fc_df, color='green', linestyle='--', label='Forecast_Tapes')
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.title('ARIMA Forecast vs True Values')
+plt.legend()
 plt.show()
+
+

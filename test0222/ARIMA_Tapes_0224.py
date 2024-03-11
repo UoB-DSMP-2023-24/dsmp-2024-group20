@@ -56,10 +56,11 @@ def aggregate_data(df, second_column, aggregation_rules,second):
     return agg_df
 
 aggregation_rules = {'price': 'mean'}
-second = 5
+second = 60
 agg_df = aggregate_data(data_csv, second_column='timestamp', aggregation_rules=aggregation_rules, second=second)
 
-add_df2 = aggregate_data(data_csv, second_column='timestamp', aggregation_rules=aggregation_rules, second=second)
+
+agg_df2 = aggregate_data(data_csv, second_column='timestamp', aggregation_rules=aggregation_rules, second=600)
 #%%
 ## ADF test
 # ADF 测试(ADF(Augmented Dickey-Fuller) 强迪基-福勒检验)——时间序列的平稳性
@@ -73,6 +74,9 @@ def ADFtest(timeseries):
     print(dfoutput)
 
 adf_agg = ADFtest(agg_df['price'])
+
+adf_agg2 = ADFtest(agg_df2['price'])
+
 ### Results of Augmented Dickey-Fuller Test:
 # Test Statistic                   -1.952236
 # p-value                           0.307900
@@ -91,6 +95,8 @@ agg_df['diff2'] = agg_df['price'].diff().diff()
 ADFtest(agg_df['diff1'].dropna())
 ADFtest(agg_df['diff2'].dropna())
 
+agg_df2['diff'] = agg_df2['price'].diff().diff()
+ADFtest(agg_df2['diff'].dropna())
 ###
 # Results of Augmented Dickey-Fuller Test:
 # Test Statistic                  -20.085583
@@ -134,12 +140,13 @@ def timestamp_to_time(data, filenames, start_time=[8, 0, 0]):
 filename = ['2025-01-02']
 agg_df = timestamp_to_time(agg_df, filename)
 
+agg_df2 = timestamp_to_time(agg_df2, filename)
 
 #%%
 # 5s聚合价格——画图
 # Tapes:  agg_5s diagram
 df_1 = agg_df.set_index('time')['diff1'].dropna()
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(120, 6))
 plt.plot(df_1, label='Tapes: diff(1) aggregated price (every %d s)' % second)
 plt.legend(loc='best')
 plt.xlabel('time')
@@ -167,7 +174,7 @@ plt.show()
 
 df_2 =agg_df[['time', 'price', 'diff1']].dropna()
 
-train_size = int(len(df_2)*0.999)
+train_size = int(len(df_2)*0.95)
 # val_size = train_size + int(len(df_2)*0.1)
 
 train = df_2[:train_size]
@@ -175,20 +182,40 @@ train = df_2[:train_size]
 test = df_2[train_size:]
 
 #%%
-dataset = train.set_index('time', inplace=False)['diff1']
-
+train.set_index('time', inplace=True)
+dataset = train['price']
+#%%
 model_auto = pm.auto_arima(dataset, start_p=0, start_q=0,
                       test='adf',  # 使用ADF测试确定'd'
                       max_p=9, max_q=9,  # 设置p和q的最大值
                       m=1,  # 数据的季节性周期
-                      d=None,  # 让模型自动确定最优的d
+                      # d=None,  # 让模型自动确定最优的d
                       seasonal=False,  # 数据不包含季节性成分
-                      stepwise=True,  # 使用逐步算法
+                      stepwise=False,  # 使用逐步算法
                       suppress_warnings=True,  # 抑制警告信息
                       information_criterion='aic',  # 使用AIC选择最佳模型
                       trace=True)  # 打印搜索过程
 # 输出模型摘要
 print(model_auto.summary())
+
+#%%
+
+## ARIMA
+# from statsmodels.tsa.arima.model import ARIMA
+#
+# train.set_index('time', inplace=True)
+# dataset = train['price']
+# model = ARIMA(dataset, order=(2, 1, 2))
+# results = model.fit()
+# forecast = results.forecast(steps=len(test))
+# forecast_df = pd.DataFrame(forecast.values, index=test.index)
+# forecast_df
+#
+# test.set_index('time', inplace=True)
+# plt.figure(figsize=(10, 6))
+# plt.plot(train, label='Training Data')
+# plt.plot(test, label='True Values')
+# plt.plot(forecast_df, label='Forecast', linestyle='--')
 
 #%%
 n_periods = len(test)
@@ -201,20 +228,27 @@ fc_df = fc_df.set_axis(index_of_fc, axis='index')
 #%%
 
 ##
-lower_series = pd.Series(confint[:, 0], index=index_of_fc)
-upper_series = pd.Series(confint[:, 1], index=index_of_fc)
+# lower_series = pd.Series(confint[:, 0], index=index_of_fc)
+# upper_series = pd.Series(confint[:, 1], index=index_of_fc)
 
 ##
-test_ = pd.DataFrame(test.set_index('time', inplace=False)['diff1'])
-plt.plot(test_['diff1'])
-plt.plot(fc_df, color='red', label='fc_Tapes')
+test.set_index('time', inplace=True)
+#%%
+
+# test_ = pd.DataFrame(test.set_index('time', inplace=False)['diff1'])
+plt.plot(train['price'][-300:], label='train')
+plt.plot(test['price'], label='test', color='orange')
+plt.plot(fc_df, color='green', linestyle='--', label='Forecast_Tapes')
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.title('ARIMA Forecast vs True Values')
+plt.legend()
+plt.show()
+
 # plt.fill_between(lower_series.index,
 #                  lower_series,
 #                  upper_series,
 #                  color='k', alpha=.15)
-
-plt.title("Final Forecast")
-plt.show()
-
 #%%
+
 
