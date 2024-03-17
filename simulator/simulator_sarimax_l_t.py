@@ -75,7 +75,7 @@ ax.set_xticklabels(limited_data['actual_datetime'].iloc[::10], rotation=45)
 
 # Beautify the plot
 plt.xlabel('Datetime')
-plt.ylabel('Value')
+plt.ylabel('Avg price change')
 plt.title('Actual vs. Forecast with Trade Signals (First 100 Points)')
 # Handle duplicate labels
 handles, labels = plt.gca().get_legend_handles_labels()

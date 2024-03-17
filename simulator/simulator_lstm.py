@@ -8,6 +8,7 @@ initial_funds = 10000
 funds = initial_funds
 stocks = 0
 buy_sell_points = []  # List to keep track of buy/sell actions
+funds_list = []
 
 for index, row in data.iterrows():
     if row['Forecast'] == 1 and funds >= row['avg_price']:  # Buy condition
@@ -20,9 +21,11 @@ for index, row in data.iterrows():
         buy_sell_points.append('Sell')
     else:
         buy_sell_points.append('Hold')
+    funds_list.append(funds)
 
 # Add the buy/sell points to the dataframe
 data['Action'] = buy_sell_points
+data['Funds'] = funds_list
 
 output_file_path = 'simulator/lstm_prediction_with_trades.csv'
 data.to_csv(output_file_path, index=False)
