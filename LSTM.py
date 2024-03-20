@@ -8,7 +8,9 @@ from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.metrics import classification_report
-import seaborn as sns
+import torch.nn.functional as F
+import shap
+
 
 seed_value = 1  # 你可以选择任何喜欢的种子值
 np.random.seed(seed_value)
@@ -24,6 +26,7 @@ fig, ax = plt.subplots(figsize=(14, 7))
 df = pd.read_csv('process_data/UoB_Set01_2025-01-02LOBs.csv')
 df = df.dropna()
 df =df.iloc[:500]
+
 # 绘制价格线
 ax.plot(df['time_window'], df['avg_price'], label='Price')
 
@@ -45,18 +48,38 @@ plt.savefig('price_trend.png')
 # 显示图表
 plt.show()
 #%%
+
+class Attention(nn.Module):
+    def __init__(self, hidden_dim):
+        super(Attention, self).__init__()
+        self.hidden_dim = hidden_dim
+        self.linear = nn.Linear(hidden_dim, 1)
+
+    def forward(self, lstm_output):
+        # lstm_output: [batch_size, seq_length, hidden_dim]
+        attention_scores = self.linear(lstm_output)  # [batch_size, seq_length, 1]
+        attention_weights = F.softmax(attention_scores, dim=1)  # 对每个序列进行softmax
+        context_vector = attention_weights * lstm_output  # [batch_size, seq_length, hidden_dim]
+        context_vector = torch.sum(context_vector, dim=1)  # [batch_size, hidden_dim]
+        return context_vector, attention_weights
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim,dropout_prob):
         super(LSTMModel, self).__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
         self.dropout = nn.Dropout(dropout_prob)
+        self.attention = Attention(hidden_dim)
         self.fc = nn.Linear(hidden_dim, output_dim)  # 输出层直接连接到分类数量
 
     def forward(self, x):
-        out, (hn, cn) = self.lstm(x)
-        out = self.dropout(out)
-        out = self.fc(out[:, -1, :])  # 取序列最后一步的输出
-        return out
+        lstm_out, (hn, cn) = self.lstm(x)  # [batch_size, seq_length, hidden_dim]
+        lstm_out = self.dropout(lstm_out)
+
+        # 注意力层
+        attn_out, attn_weights = self.attention(lstm_out)  # 使用注意力层
+
+        # 全连接层
+        out = self.fc(attn_out)  # [batch_size, output_dim]
+        return out, attn_weights  # 返回输出和注意力权重
 def create_sequences(input_data, target_data, sequence_length):
     sequences = []
     target_sequences = []
@@ -66,29 +89,36 @@ def create_sequences(input_data, target_data, sequence_length):
     return np.array(sequences), np.array(target_sequences)
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs):
-    best_loss = float('inf')  # 初始化最佳损失为无穷大
-    best_model = None  # 初始化最佳模型
+    best_accuracy = 0.0  # 初始化最佳准确率
+    best_model = None  # 初始化最佳模型权重
     best_epoch = 0  # 初始化最佳模型的训练轮次
+
     for epoch in range(num_epochs):
-        model.train()
+        model.train()  # 设置模型为训练模式
         train_loss = 0.0
+
         for X_batch, y_batch in train_loader:
             optimizer.zero_grad()
-            y_pred = model(X_batch)
+
+            # 由于模型修改为返回一个元组，我们这里仅使用输出
+            y_pred, _ = model(X_batch)  # 获取模型的输出和注意力权重
             loss = criterion(y_pred, y_batch)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
+
         # 计算平均训练损失
         train_loss /= len(train_loader)
-        # 验证过程
-        model.eval()  # 将模型设置为评估模式
+
+        # 进入评估模式
+        model.eval()
         test_loss = 0.0
         correct = 0
         total = 0
-        with torch.no_grad():  # 在验证过程中不计算梯度
+
+        with torch.no_grad():
             for X_val_batch, y_val_batch in val_loader:
-                y_val_pred = model(X_val_batch)
+                y_val_pred, _ = model(X_val_batch)  # 同样，仅使用输出
                 test_loss += criterion(y_val_pred, y_val_batch).item()
                 _, predicted = torch.max(y_val_pred.data, 1)
                 total += y_val_batch.size(0)
@@ -98,24 +128,26 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         test_loss /= len(val_loader)
         test_accuracy = correct / total
 
-        if test_loss < best_loss:
+        # 更新最佳模型（如果适用）
+        if test_accuracy > best_accuracy:
             best_epoch = epoch
-            best_loss = test_loss
-            best_model = model.state_dict()  # 保存最佳模型的状态字典
-            # 保存模型状态字典
+            best_accuracy = test_accuracy
+            best_model = model.state_dict()
             torch.save(best_model, 'model/best_model.pth')
 
         print(f'Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss:.4f}, '
-              f'Test Loss: {test_loss:.4f}, 'f'Test Accuracy: {test_accuracy:.4f}, '
+              f'Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}, '
               f'Best Epoch: {best_epoch+1}')
 
+    model.load_state_dict(torch.load('model/best_model.pth'))
+    return model
 # 预测
 def predict(model, test_loader):
     model.eval()
     predictions = []
     with torch.no_grad():
         for X_batch, _ in test_loader:
-            y_test_pred = model(X_batch)
+            y_test_pred,_ = model(X_batch)
             predictions.append(y_test_pred.numpy())
     return np.concatenate(predictions, axis=0)
 
@@ -128,8 +160,10 @@ df = df.dropna()
 start_date = pd.to_datetime('2025-01-02 08:00:00')
 df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
 df.set_index('actual_datetime', inplace=True)
-feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change',
-            'bid_level_diff', 'ask_level_diff','bid_ask_depth_diff']]
+df_index = df.index
+feature=df[['avg_price','avg_price_change', 'bid_level_diff', 'ask_level_diff',
+             'bid_ask_depth_diff']]
+
 target=df['label']
 
 scaler = StandardScaler()
@@ -179,13 +213,14 @@ model = LSTMModel(input_dim, hidden_dim, num_layers, output_dim,dropout_prob)
 criterion = nn.CrossEntropyLoss()  # 用于多分类问题
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
+#%%
 # 训练模型
-num_epochs = 10
+num_epochs = 20
 train_model(model, train_loader,test_loader,criterion, optimizer, num_epochs)
 
 #%%
 # 测试模型性能# 此函数应该返回模型在测试集上的预测
-model.load_state_dict(torch.load('model/best_model.pth'))
+#model.load_state_dict(torch.load('model/best_model(2).pth'))
 predictions = predict(model, test_loader)
 
 # 将输出的概率转换为类别索引
@@ -236,3 +271,15 @@ f1 = f1_score(y_test_tensor, predicted_classes.numpy(), average='macro')
 
 print(f"Accuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1 Score: {f1}")
 
+
+#%%
+df_index_test = df_index[train_size:]
+test_timestamps = df_index_test[sequence_length :]
+avg_price = df['avg_price'].values[train_size+sequence_length:]
+df_result = pd.DataFrame({
+    'Actual': y_test_tensor.numpy(),
+    'Forecast': predicted_classes.numpy(),
+    'avg_price':avg_price
+},index=test_timestamps)
+
+df_result.to_csv('test_predictions_comparison.csv')
