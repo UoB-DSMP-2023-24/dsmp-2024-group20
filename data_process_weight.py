@@ -82,6 +82,7 @@ def before_agg_get_feature(df):
 
 def after_agg_get_feature(df):
     df['avg_price'] = (df['avg_weight_bid'] + df['avg_weight_ask']) / 2
+    df['avg_price_change'] = df['avg_price'] / df['avg_price'].shift(1) - 1
     df['bid_level_diff'] = df['avg_weight_bid'] / df['avg_price'] - 1
     df['ask_level_diff'] = df['avg_weight_ask'] / df['avg_price'] - 1
     df['bid_ask_depth_diff'] = ((df['bid_cumulative_depth'] - df['ask_cumulative_depth'])/
