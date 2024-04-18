@@ -75,6 +75,7 @@ def before_agg_get_feature(df):
     df['ask_cumulative_depth'] = df['ask_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 
 
+
     return df
 
 def after_agg_get_feature(df):
@@ -128,15 +129,20 @@ for file_path in file_paths:
     print("--------------Processing file:", original_file_name,"--------------")
     df = process_lob_file(file_path)
     df = before_agg_get_feature(df)
-    df = aggregate_data(df, 'time', aggregation_rules,1)
+    df = aggregate_data(df, 'time', aggregation_rules,5)
     df = after_agg_get_feature(df)
-    df = mark_label(df,10,0.005)
+    df = mark_label(df,20,0.001)
+
+    date_part = original_file_name.split('_')[2]  # 文件名格式: "UoB_Set01_2025-01-02LOBs.csv"
+    date = date_part[:10]
+    df['date'] = date
+    df.insert(0, 'date', df.pop('date'))
     new_file_name = os.path.splitext(original_file_name)[0] + '.csv'
     # 3. 构建新的文件路径
     output_file_path = os.path.join(output_path, new_file_name)
     # 处理完毕后的DataFrame可以进行保存或其他操作
     # 例如，保存到CSV文件
     df.to_csv(output_file_path, index=False)
-    if True:
-        break
+    # if True:
+    #     break
 print("--------------All files processed successfully!----------------")
