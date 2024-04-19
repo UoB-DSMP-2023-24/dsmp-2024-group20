@@ -1,11 +1,10 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 #%%
-df = pd.read_csv('/Users/fanxinwei/Desktop/code/train_data/uob_mini_project/total_lob_30.csv')
+df = pd.read_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/total_lob_300.csv')
 df = df.dropna()
 # 解析日期
 df['date'] = pd.to_datetime(df['date'])
@@ -72,4 +71,4 @@ plt.show()
 #%%
 # 输出为csv文件，便于后续分析
 comparison_df['avg_price'] = test['avg_price']
-comparison_df.to_csv('simulator/arima_prediction_comparison.csv', index=True)
+comparison_df.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/arima_prediction_comparison.csv', index=True)
