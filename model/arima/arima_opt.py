@@ -61,7 +61,7 @@ plt.xlabel('Time')
 plt.ylabel('Avg Price change')
 plt.title('Avg Price change Forecast vs Actual')
 plt.legend()
-plt.savefig('output_data/forecast_vs_actual(SARIMAX).png')
+plt.savefig('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/forecast_vs_actual(SARIMAX).png')
 plt.show()
 
 
