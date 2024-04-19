@@ -5,12 +5,14 @@ from matplotlib import pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 #%%
-df = pd.read_csv('output_data/UoB_Set01_2025-01-02LOBs.csv')
+df = pd.read_csv('/Users/fanxinwei/Desktop/code/train_data/uob_mini_project/total_lob_30.csv')
 df = df.dropna()
-start_date = pd.to_datetime('2025-01-02 08:00:00')
-df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
-
-df.set_index('actual_datetime', inplace=True)
+# 解析日期
+df['date'] = pd.to_datetime(df['date'])
+# 将时间窗口转换为timedelta（时间窗口以秒为单位），并设置每天的起始时间为8:00
+df['datetime'] = df['date'] + pd.to_timedelta('8 hours') + pd.to_timedelta(df['time_window'], unit='s')
+# 设置新的日期时间为索引
+df.set_index('datetime', inplace=True)
 
 #%%
 # 使用auto_arima寻找最佳SARIMAX模型参数

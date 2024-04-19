@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import numpy as np
+from pandas import Timedelta
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from torch.utils.data import TensorDataset, DataLoader
@@ -154,12 +155,19 @@ def predict(model, test_loader):
 
 #%%
 
-df = pd.read_csv('process_data/UoB_Set01_2025-01-02LOBs.csv')
+df = pd.read_csv('/Users/fanxinwei/Desktop/code/train_data/uob_mini_project/total_lob_30.csv')
 df = df.dropna()
 # df = df.iloc[:5000]
-start_date = pd.to_datetime('2025-01-02 08:00:00')
-df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
-df.set_index('actual_datetime', inplace=True)
+# start_date = pd.to_datetime('2025-01-02 08:00:00')
+# df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
+
+# 解析日期
+df['date'] = pd.to_datetime(df['date'])
+# 将时间窗口转换为timedelta（时间窗口以秒为单位），并设置每天的起始时间为8:00
+df['datetime'] = df['date'] + pd.to_timedelta('8 hours') + pd.to_timedelta(df['time_window'], unit='s')
+# 设置新的日期时间为索引
+df.set_index('datetime', inplace=True)
+
 df_index = df.index
 feature=df[['avg_price','avg_price_change', 'bid_level_diff', 'ask_level_diff',
              'bid_ask_depth_diff']]
@@ -205,13 +213,13 @@ test_loader = DataLoader(test_data, batch_size=batch_size)
 input_dim = X_train.shape[2]
 hidden_dim = 100 # 隐藏层维度
 num_layers = 5 # LSTM层的数量
-output_dim =  3# 输出维度
+output_dim = 3 # 输出维度
 dropout_prob = 0.2
 
 model = LSTMModel(input_dim, hidden_dim, num_layers, output_dim,dropout_prob)
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()  # 用于多分类问题
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 #%%
 # 训练模型
