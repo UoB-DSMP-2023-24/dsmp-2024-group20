@@ -61,7 +61,7 @@ def predict(model, X):
 
 #%%
 
-df = pd.read_csv('process_data/UoB_Set01_2025-01-02LOBs.csv')
+df = pd.read_csv('../../output_data/UoB_Set01_2025-01-02LOBs.csv')
 df = df.dropna()
 # df = df.iloc[:8000]
 
@@ -112,16 +112,23 @@ train_model(model, train_loader, criterion, optimizer, num_epochs=10)
 # 预测
 predictions = predict(model, X_test_tensor)
 #%%
+
+#%%
 import torch
 import torch.nn.functional as F
 
-
-# 计算均方误差
-mse = torch.mean((predictions - y_test_tensor.float()) ** 2)
+# compute mse loss for the predictions
+predictions_tensor = torch.from_numpy(predictions).float()
+mse = F.mse_loss(predictions_tensor, y_test_tensor)
 print("MSE:", mse.item())
-
-
-
+# compute rmse
+rmse = torch.sqrt(mse)
+print("RMSE:", rmse.item())
+# compute r2 score
+ssr = torch.sum((predictions_tensor - y_test_tensor) ** 2)
+sst = torch.sum((y_test_tensor - torch.mean(y_test_tensor)) ** 2)
+r2 = 1 - ssr / sst
+print("R2 Score:", r2.item())
 
 #%%
 time_index = X_test.index[time_steps:]
