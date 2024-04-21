@@ -73,8 +73,8 @@ plot_x = range(1, len(test)+1)  #%% x轴的坐标 （避免相邻两天中几个
 
 #%%
 plt.figure(figsize=(10, 6))
-plt.plot(test.index[:n], test['l_t'][:n], label='Actual', color='red')
-plt.plot(test.index[:n], preds[:n], label='Forecast', color='blue')
+plt.plot(plot_x[:n], test['l_t'][:n], label='Actual', color='red')
+plt.plot(plot_x[:n], preds[:n], label='Forecast', color='blue')
 plt.axhline(y=0, color='gray', linestyle='--')
 plt.xlabel('Time')
 plt.ylabel('Avg Price change')
