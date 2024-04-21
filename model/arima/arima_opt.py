@@ -1,6 +1,20 @@
+import requests
+
+def download_file(url, local_filename):
+    # 使用requests下载文件
+    r = requests.get(url, allow_redirects=True)
+    open(local_filename, 'wb').write(r.content)
+
+# GitHub文件的URL
+url = '...'
+local_filename = '...'
+
+# 调用函数下载文件
+download_file(url, local_filename)
+
+#%%
 import pandas as pd
 from matplotlib import pyplot as plt
-
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 #%%
