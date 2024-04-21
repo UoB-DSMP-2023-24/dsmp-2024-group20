@@ -3,3 +3,7 @@
 cd project/dsmp-2024-group20
 pip install names-of-the-package  【其中names-of-the-package自己输】
 python3 name-of-the-python-file 【其中name-of-the-python-file自己输】
+
+## some packages in arima_opt_aws.py ==> SARIMAX file
+pip install boto3 pandas matplotlib statsmodels   
+python3 arima_opt_aws.py
