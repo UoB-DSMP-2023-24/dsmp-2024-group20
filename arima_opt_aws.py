@@ -44,7 +44,7 @@ df.set_index('datetime', inplace=True)
 # print(stepwise_model.aic())
 
 #%%
-df = df.iloc[:5000]
+# df = df.iloc[:5000]
 N = df.shape[0]
 
 # 划分训练集和测试集
@@ -63,11 +63,15 @@ preds = results.forecast(steps=test.shape[0], exog=test[['max_bid','min_ask','av
                                                          'avg_price_change','bid_level_diff',
                                                          'ask_level_diff', 'bid_cumulative_depth',
                                                          'ask_cumulative_depth']])
+preds.index = test.index
 
 #%%
 preds_series = pd.Series(preds, index=test.index)
 comparison_df = pd.DataFrame({'Actual': test['l_t'], 'Forecast': preds_series})
 n = 100
+plot_x = range(1, len(test)+1)  #%% x轴的坐标 （避免相邻两天中几个小时数据空白对于图像的影响）
+
+#%%
 plt.figure(figsize=(10, 6))
 plt.plot(test.index[:n], test['l_t'][:n], label='Actual', color='red')
 plt.plot(test.index[:n], preds[:n], label='Forecast', color='blue')
@@ -85,7 +89,7 @@ plt.savefig(img_data, format='png', bbox_inches='tight')
 img_data.seek(0)  # 移动到流的开始位置
 
 # 指定图像文件名
-object_key = 'forecast_vs_actual(SARIMAX).png'
+object_key = '30s/forecast_vs_actual(SARIMAX).png'
 
 # 上传图像数据到S3
 s3_client.upload_fileobj(img_data, bucket_name, object_key)
@@ -100,7 +104,7 @@ print(f"Image uploaded to S3: s3://{bucket_name}/{object_key}")
 comparison_df['avg_price'] = test['avg_price']
 # comparison_df.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/arima_prediction_comparison.csv', index=True)
 ## 指定上传的文件名
-object_key = 'arima_prediction_comparison.csv' 
+object_key = '30s/arima_prediction_comparison.csv' 
 
 # 把DataFrame保存到一个字符串缓冲区中
 csv_buffer = StringIO()
