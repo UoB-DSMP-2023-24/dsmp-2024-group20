@@ -1,0 +1,5 @@
+
+## finding the files in github---- using AWS EC2
+cd project/dsmp-2024-group20
+pip install names-of-the-package  【其中names-of-the-package自己输】
+python3 name-of-the-python-file 【其中name-of-the-python-file自己输】
