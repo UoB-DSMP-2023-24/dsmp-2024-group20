@@ -7,7 +7,7 @@ from io import StringIO  ## 为了后面存文件
 s3_client = boto3.client('s3')
 
 bucket_name = 'lob-data-processed'
-object_key = 'lob-data-processed/total_lob_30.csv'
+object_key = 'total_lob_30.csv'
 
 obj = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 df = pd.read_csv(BytesIO(obj['Body'].read()))
