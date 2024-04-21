@@ -1,7 +1,8 @@
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
-stock_file = '/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/input_data/total_lob_30.csv'
+# stock_file = '/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/input_data/total_lob_30.csv'
+stock_file = '/root/project/dsmp-2024-group20/input_data/total_lob_30.csv'
 df = pd.read_csv(stock_file)
 # 解析日期
 df['date'] = pd.to_datetime(df['date'])
