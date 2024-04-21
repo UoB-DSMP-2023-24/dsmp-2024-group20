@@ -7,7 +7,9 @@ from io import StringIO  ## 为了后面存文件
 s3_client = boto3.client('s3')
 
 bucket_name = 'lob-data-processed'
-object_key = 'total_lob_30.csv'
+# object_key = 'total_lob_30.csv'
+object_key = 'total_lob_60.csv'
+
 
 obj = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 df = pd.read_csv(BytesIO(obj['Body'].read()))
@@ -89,7 +91,8 @@ plt.savefig(img_data, format='png', bbox_inches='tight')
 img_data.seek(0)  # 移动到流的开始位置
 
 # 指定图像文件名
-object_key = '30s/forecast_vs_actual(SARIMAX).png'
+# object_key = '30s/forecast_vs_actual(SARIMAX).png'
+object_key = '60s/forecast_vs_actual(SARIMAX).png'
 
 # 上传图像数据到S3
 s3_client.upload_fileobj(img_data, bucket_name, object_key)
@@ -104,7 +107,8 @@ print(f"Image uploaded to S3: s3://{bucket_name}/{object_key}")
 comparison_df['avg_price'] = test['avg_price']
 # comparison_df.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/arima_prediction_comparison.csv', index=True)
 ## 指定上传的文件名
-object_key = '30s/arima_prediction_comparison.csv' 
+# object_key = '30s/arima_prediction_comparison.csv' 
+object_key = '60s/arima_prediction_comparison.csv' 
 
 # 把DataFrame保存到一个字符串缓冲区中
 csv_buffer = StringIO()
