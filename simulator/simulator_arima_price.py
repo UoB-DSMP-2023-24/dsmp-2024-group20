@@ -1,39 +1,44 @@
-# 预测的股票价格序列
-predicted_prices = [297.486500, 298.937643, 299.598436, 300.119995, 300.457963]
+import pandas as pd
 
-# 初始资本和每次交易的股票数量
-initial_capital = 1000
-stock_quantity = 1
+# 加载数据
+file_path = '/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/model/arima/forecast_arima.csv'
+data = pd.read_csv(file_path)
 
-# 模拟交易
-capital = initial_capital
-stock_owned = 0
-transactions = []
+initial_funds = 10000
+funds = initial_funds
+stocks = 0
+buy_sell_points = []  # List to keep track of buy/sell actions
 
-for i in range(len(predicted_prices) - 1):
-    today_price = predicted_prices[i]
-    tomorrow_price = predicted_prices[i + 1]
+# We skip the first row initially because there is no previous forecast to compare with
+for index in range(1, len(data)):
+    current_forecast = data.loc[index, 'Forecast']
+    previous_forecast = data.loc[index - 1, 'Forecast']
+    avg_price = data.loc[index, 'tapes']
 
-    # 如果明天的价格预测高于今天，尝试买入一股
-    if tomorrow_price > today_price and capital >= today_price:
-        capital -= today_price
-        stock_owned += stock_quantity
-        transactions.append(f"Day {i + 1}: Bought 1 stock at {today_price}")
-    # 如果明天的价格预测低于今天，尝试卖出一股
-    elif tomorrow_price < today_price and stock_owned >= stock_quantity:
-        capital += today_price
-        stock_owned -= stock_quantity
-        transactions.append(f"Day {i + 1}: Sold 1 stock at {today_price}")
+    if current_forecast > previous_forecast and funds >= avg_price:  # Buy condition
+        funds -= avg_price  # Deduct the price of one stock from funds
+        stocks += 1  # Increase stock count
+        buy_sell_points.append('Buy')
+    elif current_forecast < previous_forecast and stocks > 0:  # Sell condition
+        funds += avg_price  # Add the price of one stock to funds
+        stocks -= 1  # Decrease stock count
+        buy_sell_points.append('Sell')
+    else:
+        buy_sell_points.append('Hold')
 
-# 最后一天，如果持有股票，则全部卖出
-last_day_price = predicted_prices[-1]
-if stock_owned > 0:
-    capital += stock_owned * last_day_price
-    stock_owned = 0
-    transactions.append(f"Day {len(predicted_prices)}: Sold {stock_quantity} stock at {last_day_price}")
+# Insert 'Hold' for the first row as there's no action to take
+buy_sell_points.insert(0, 'Hold')
 
-# 计算最终资本和利润
-final_capital = capital
-profit = final_capital - initial_capital
+# Add the buy/sell points to the dataframe
+data['Action'] = buy_sell_points
 
-transactions, final_capital, profit
+output_file_path = '/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/model/arima/arima_trades.csv'
+data.to_csv(output_file_path, index=False)
+
+# Calculate the value of remaining stocks at the last available price
+final_stock_value = stocks * data.iloc[-1]['tapes']
+total_value = funds + final_stock_value
+profit = total_value - initial_funds
+
+print(funds, stocks, final_stock_value, total_value, profit)
+
