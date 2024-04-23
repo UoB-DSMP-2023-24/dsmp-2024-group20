@@ -19,14 +19,7 @@ from io import StringIO  ## 为了后面存文件
 # 定义处理CSV文件的函数
 ## 读入文件 read the files
 def read_csvfile(bucket, key):
-    print("-----")
-    print("bucket")
-    print(bucket)
-    print("key")
-    print(key)
     obj = bucket.Object(key)
-    print(object)
-    print(obj)
     data = pd.read_csv(obj.get()['Body'])
     print(data)
     file_name = os.path.basename(object.key)
@@ -93,6 +86,7 @@ def read_LOBtxt(bucket, key):
     LOB_list = []  # 用于存储
     obj = bucket.Object(key)
     txt = obj.get()['Body'].read().decode('utf-8')
+    print(object)
     file_name = os.path.basename(object.key)
     # column_names = ['timestamp', 'price', 'quantity']
     data = add_quotes_to_specific_word(txt, 'Exch0')
@@ -220,10 +214,9 @@ date = []
 
 tapes_prefix = 'raw-dataset/Tapes/'
 for obj in bucket.objects.filter(Prefix=tapes_prefix):
-    print("obj")
-    print(obj)
+
     if obj.key.endswith('.csv'):
-        original_file_name = os.path.basename(obj.key)
+        original_file_name = os.path.basename(obj.key)   
         print("--------------Processing Tapes files:", original_file_name,"--------------")
         data_Tapes= read_LOBtxt(bucket, obj.key)
         agg_Tapes = aggregate_Tapes(data_Tapes, second_column='timestamp', second=second)
