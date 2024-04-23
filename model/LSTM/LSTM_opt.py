@@ -18,26 +18,26 @@ import matplotlib.pyplot as plt
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-df = pd.read_csv('/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/output_data/UoB_Set01_2025-01-02LOBs.csv')
+df = pd.read_csv('/Users/fanxinwei/Desktop/code/git_repo/dsmp-2024-group20/input_data/whole_dataset_300s.csv')
 df = df.dropna()
 
 # 将日期列转换为datetime对象
-df['date'] = pd.to_datetime(df['date'])
+df['time'] = pd.to_datetime(df['time'])
 
 # 创建代表早上8点的timedelta对象
 eight_am = pd.to_timedelta('8 hours')
 
 # 将秒转换为timedelta对象
-df['time_window'] = pd.to_timedelta(df['time_window'], unit='s')
+df['time_window_x'] = pd.to_timedelta(df['time_window_x'], unit='s')
 
 # 将日期和时间相加
-df['datetime'] = df['date'] + eight_am + df['time_window']
+df['datetime'] = df['time'] + eight_am + df['time_window_x']
 #设置datetime为索引
 df.set_index('datetime', inplace=True)
 #删除不需要的列
-df.drop(['date', 'time_window'], axis=1, inplace=True)
+df.drop(['date', 'time_window_x'], axis=1, inplace=True)
 
-feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change']]
+feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change', 'l_t']]
 
 target=df['l_t']
 
@@ -103,7 +103,7 @@ class LSTMModel(nn.Module):
 
 # 模型参数
 input_dim = feature.shape[1]  # 输入特征维数
-hidden_dim = 100  # LSTM隐藏层维数
+hidden_dim = 20  # LSTM隐藏层维数
 output_dim = 1  # 输出维数，假设我们在做回归预测
 num_layers = 2  # LSTM层数
 dropout_rate = 0.2  # Dropout比率，有助于防止过拟合
