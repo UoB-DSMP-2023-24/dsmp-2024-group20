@@ -19,6 +19,9 @@ from io import StringIO  ## 为了后面存文件
 # 定义处理CSV文件的函数
 ## 读入文件 read the files
 def read_csvfile(bucket, key):
+    print("-----")
+    print(bucket)
+    print(key)
     obj = bucket.Object(key)
     data = pd.read_csv(obj.get()['Body'])
     file_name = os.path.basename(object.key)
@@ -212,6 +215,7 @@ date = []
 
 tapes_prefix = 'raw-dataset/Tapes/'
 for obj in bucket.objects.filter(Prefix=tapes_prefix):
+    print(obj)
     if obj.key.endswith('.csv'):
         original_file_name = os.path.basename(obj.key)
         print("--------------Processing Tapes files:", original_file_name,"--------------")
