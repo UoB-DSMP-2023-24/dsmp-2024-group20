@@ -21,8 +21,8 @@ from io import StringIO  ## 为了后面存文件
 def read_csvfile(bucket, key):
     obj = bucket.Object(key)
     data = pd.read_csv(obj.get()['Body'])
-    print(data)
-    file_name = os.path.basename(object.key)
+    # print(data)
+    file_name = os.path.basename(obj.key)
     date = file_name.split('_')[2][:10]
     column_names = ['timestamp', 'price', 'quantity']
     data = pd.read_csv(obj.get()['Body'], header=None, names=column_names, usecols=[0, 1, 2])
@@ -94,8 +94,8 @@ def read_LOBtxt(bucket, key):
     lines = data.split('\n')
     for line in lines:
         if line:
-            print(line)
-            print(ast.literal_eval(line))
+            # print(line)
+            # print(ast.literal_eval(line))
             each_line = list(ast.literal_eval(line))  # 转换行
             date = file_name[10:20]
             line_withdate = insert_date(each_line, 3, date)  # 假设在列表的末尾插入日期
