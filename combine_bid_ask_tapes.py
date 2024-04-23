@@ -88,7 +88,7 @@ def read_LOBtxt(bucket, key):
     txt = obj.get()['Body'].read().decode('utf-8')
     print(object)
     print(obj)
-    file_name = os.path.basename(object.key)
+    file_name = os.path.basename(obj.key)
     # column_names = ['timestamp', 'price', 'quantity']
     data = add_quotes_to_specific_word(txt, 'Exch0')
     lines = data.split('\n')
