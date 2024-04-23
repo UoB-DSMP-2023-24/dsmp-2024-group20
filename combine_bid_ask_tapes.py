@@ -20,7 +20,9 @@ from io import StringIO  ## 为了后面存文件
 ## 读入文件 read the files
 def read_csvfile(bucket, key):
     print("-----")
+    print("bucket")
     print(bucket)
+    print("key")
     print(key)
     obj = bucket.Object(key)
     print(object)
@@ -218,6 +220,7 @@ date = []
 
 tapes_prefix = 'raw-dataset/Tapes/'
 for obj in bucket.objects.filter(Prefix=tapes_prefix):
+    print("obj")
     print(obj)
     if obj.key.endswith('.csv'):
         original_file_name = os.path.basename(obj.key)
