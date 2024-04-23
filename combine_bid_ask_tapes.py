@@ -87,6 +87,7 @@ def read_LOBtxt(bucket, key):
     obj = bucket.Object(key)
     txt = obj.get()['Body'].read().decode('utf-8')
     print(object)
+    print(obj)
     file_name = os.path.basename(object.key)
     # column_names = ['timestamp', 'price', 'quantity']
     data = add_quotes_to_specific_word(txt, 'Exch0')
