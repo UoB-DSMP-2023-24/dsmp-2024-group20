@@ -94,7 +94,7 @@ def read_LOBtxt(bucket, key):
     lines = data.split('\n')
     for line in lines:
         if line:
-            each_line = ast.literal_eval(line)  # 转换行
+            each_line = list(ast.literal_eval(line))  # 转换行
             date = file_name[10:20]
             line_withdate = insert_date(each_line, 3, date)  # 假设在列表的末尾插入日期
             LOB_list.append(line_withdate)
