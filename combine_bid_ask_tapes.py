@@ -23,7 +23,10 @@ def read_csvfile(bucket, key):
     print(bucket)
     print(key)
     obj = bucket.Object(key)
+    print(object)
+    print(obj)
     data = pd.read_csv(obj.get()['Body'])
+    print(data)
     file_name = os.path.basename(object.key)
     date = file_name.split('_')[2][:10]
     column_names = ['timestamp', 'price', 'quantity']
