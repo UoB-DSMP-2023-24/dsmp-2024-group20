@@ -51,10 +51,7 @@ def read_LOBtxt(directory):
                         LOB_list.append(line_withdate)
     return LOB_list, file_names
 
-### ????
-# for line in lines:
-#     if line:
-#         LOB_list = LOB_list.append(ast.literal_eval(line))
+
 
 #%%
 ## save the List
@@ -335,7 +332,7 @@ agg_ask2 = timestamp_to_time(agg_ask2, filename)
 
 #%%
 ## ACF & PACF 图像
-## 图片的线不对劲-- 模块有点问题， 不影响大局
+## 记得及时更新画图的模块！！
 agg_df = agg_bid2
 # agg_df = agg_ask2
 
@@ -385,8 +382,8 @@ model_auto = pm.auto_arima(dataset, start_p=0, start_q=0,
 print(model_auto.summary())
 
 ### AIC和BIC值太高了———————— 绝对值意义不大， 要看不同模型之间的相对值
-### 需要尝试重新处理数据?
-### 要不尝试给数据加上 年月日 时分秒？
+### 需要尝试重新处理数据?  ## 后面已经重新对数据进行了处理
+### 要不尝试给数据加上 年月日 时分秒？ ## 后面已经做了改进
 #%%
 ## forecast
 n_periods = len(test)
