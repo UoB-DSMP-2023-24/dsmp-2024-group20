@@ -157,7 +157,8 @@ plt.show()
 
 #%%
 ## ACF & PACF 图像
-## 图片的线不对劲-- 模块有点问题， 不影响大局
+## 图片的线不对劲-- 模块有点问题， 不影响大局  
+## 同ARIMA_LOB及时更新画图的包就行了
 lags = 40
 y = agg_df[['time', 'diff1']].dropna().set_index('time', inplace=False)
 plt.figure(figsize=(12, 6))
@@ -168,7 +169,7 @@ plot_pacf(y, lags=lags)  # PACF图
 plt.title('PACF of Time Series')
 plt.show()
 
-## 不好找p和q的值
+## 不好找p和q的值 ## 更推荐使用auto.arima()
 #%%
 ## split the data
 
