@@ -40,6 +40,14 @@ df['datetime'] = df['date'] + pd.to_timedelta('8 hours') + pd.to_timedelta(df['t
 df.set_index('datetime', inplace=True)
 
 #%%
+# df = df.iloc[:5000]
+N = df.shape[0]
+
+# 划分训练集和测试集
+train = df.iloc[:int(N*0.8)]  # 训练集：除了最后N个观测点外的所有数据
+test = df.iloc[int(N*0.8):N]  # 测试集：最后N个观测点
+
+#%%
 # 使用auto_arima寻找最佳SARIMAX模型参数
 # stepwise_model = auto_arima(df['market_price'], exogenous=df[['time_window', 'bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']],
 #                             start_p=1, start_q=1,
@@ -54,14 +62,25 @@ df.set_index('datetime', inplace=True)
 # #Best model:  ARIMA(1,0,2)(2,1,0)[12]
 # print(stepwise_model.aic())
 
+###########################################
+#%%  ## 预测 train['l_t']
+# stepwise_model = auto_arima(train['l_t'], 
+#                             exogenous=train[[ 'max_bid','min_ask','avg_price',
+#                                               'bid_level_diff', 'ask_level_diff', 
+#                                               'bid_cumulative_depth', 'ask_cumulative_depth']],
+#                             start_p=1, start_q=1,
+#                             max_p=3, max_q=3, m=12,
+#                             start_P=0, seasonal=True,
+#                             d=1, D=1, trace=True,
+#                             error_action='ignore',  
+#                             suppress_warnings=True, 
+#                             stepwise=True)
+
+# # 打印选定模型的AIC
+# print(stepwise_model.aic())
+# print(stepwise_model.summary())
+
 #%%
-# df = df.iloc[:5000]
-N = df.shape[0]
-
-# 划分训练集和测试集
-train = df.iloc[:int(N*0.8)]  # 训练集：除了最后N个观测点外的所有数据
-test = df.iloc[int(N*0.8):N]  # 测试集：最后N个观测点
-
 model = SARIMAX(train['l_t'],
                 exog=train[[ 'max_bid','min_ask','avg_price','avg_price_change','bid_level_diff',
                              'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']],
