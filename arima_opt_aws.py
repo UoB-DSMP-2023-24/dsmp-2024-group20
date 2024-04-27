@@ -9,8 +9,8 @@ from io import StringIO  ## 为了后面存文件
 s3_client = boto3.client('s3')
 
 bucket_name = 'lob-data-processed'
-object_key = 'total_lob_30.csv'
-# object_key = 'total_lob_60.csv'
+# object_key = 'total_lob_30.csv'
+object_key = 'total_lob_60.csv'
 # object_key = 'total_lob_300.csv'
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/total_lob_1s_k10_0.1.csv'
 
@@ -139,8 +139,8 @@ plt.savefig(img_data, format='png', bbox_inches='tight')
 img_data.seek(0)  # 移动到流的开始位置
 
 # 指定图像文件名
-object_key = '30s/forecast_vs_actual(SARIMAX)_2.png'
-# object_key = '60s/forecast_vs_actual(SARIMAX)_2.png'
+# object_key = '30s/forecast_vs_actual(SARIMAX)_2.png'
+object_key = '60s/forecast_vs_actual(SARIMAX)_2.png'
 # object_key = '300s/forecast_vs_actual(SARIMAX)_2.png'
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/fc_(SARIMAX)_1s_k10.png'
 
@@ -158,8 +158,8 @@ print(f"Image uploaded to S3: s3://{bucket_name}/{object_key}")
 comparison_df['avg_price'] = test['avg_price']
 # comparison_df.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/sarimax_prediction_comparison.csv', index=True)
 ## 指定上传的文件名
-object_key = '30s/sarimax_prediction_comparison_2.csv' 
-# object_key = '60s/sarimax_prediction_comparison_2.csv' 
+# object_key = '30s/sarimax_prediction_comparison_2.csv' 
+object_key = '60s/sarimax_prediction_comparison_2.csv' 
 # object_key = '300s/sarimax_prediction_comparison_2.csv' 
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_1s_k10.csv'
 
@@ -204,8 +204,8 @@ print(f"MSE: {mse}, RMSE: {rmse}, MAE: {mae}, MAPE: {mape}")
 # print(f"AIC: {results.aic}, BIC: {results.bic}")   ## 
 
 ## 指定上传的文件名
-object_key = '30s/SARIMAX_evaluation_2.csv' 
-# object_key = '60s/SARIMAX_evaluation_2.csv' 
+# object_key = '30s/SARIMAX_evaluation_2.csv' 
+object_key = '60s/SARIMAX_evaluation_2.csv' 
 # object_key = '300s/SARIMAX_evaluation_2.csv' 
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_evaluation_1s_k10.csv'
 
