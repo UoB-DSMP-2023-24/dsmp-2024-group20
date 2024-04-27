@@ -49,16 +49,18 @@ train = df.iloc[:int(N*0.8)]  # 训练集：除了最后N个观测点外的所�
 test = df.iloc[int(N*0.8):N]  # 测试集：最后N个观测点
 
 #%%
-## 使用auto_arima寻找最佳SARIMAX模型参数
-stepwise_model = auto_arima(df['market_price'], exogenous=df[['time_window', 'bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth']],
+# 使用auto_arima寻找最佳SARIMAX模型参数
+stepwise_model = auto_arima(train['l_t'],
+                            exogenous=train[[ 'max_bid','min_ask','avg_price',
+                                              'bid_level_diff', 'ask_level_diff',
+                                              'bid_cumulative_depth', 'ask_cumulative_depth']],
                             start_p=1, start_q=1,
                             max_p=3, max_q=3, m=12,
                             start_P=0, seasonal=True,
-                            d=None, D=1, trace=True,
+                            d=1, D=1, trace=True,
                             error_action='ignore',
                             suppress_warnings=True,
                             stepwise=True)
-
 stepwise_model.fit()
 
 summary = stepwise_model.summary().as_text()
