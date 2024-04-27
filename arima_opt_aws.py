@@ -9,10 +9,10 @@ from io import StringIO  ## 为了后面存文件
 s3_client = boto3.client('s3')
 
 bucket_name = 'lob-data-processed'
-# object_key = 'total_lob_30.csv'
+object_key = 'total_lob_30.csv'
 # object_key = 'total_lob_60.csv'
 # object_key = 'total_lob_300.csv'
-object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/total_lob_1s_k10_0.1.csv'
+# object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/total_lob_1s_k10_0.1.csv'
 
 obj = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 df = pd.read_csv(BytesIO(obj['Body'].read()))
@@ -101,22 +101,22 @@ comparison_df = pd.DataFrame({'Actual': test['l_t'], 'Forecast': preds_series})
 n = 100
 plot_x = range(1, len(test)+1)  #%% x轴的坐标 （避免相邻两天中几个小时数据空白对于图像的影响）
 
-#%%
-## 储存模型
-## save the model 存模型-- joblib ## from joblib import dump
-# 保存模型(在本地)
-local_file_path = 'E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/whole_dataset_processed/model/SARIMAX_1s_k10.joblib'  ## 注意路径中的 双反斜杠
-dump(results, local_file_path)
+# #%%
+# ## 储存模型
+# ## save the model 存模型-- joblib ## from joblib import dump
+# # 保存模型(在本地)
+# local_file_path = 'E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/whole_dataset_processed/model/SARIMAX_1s_k10.joblib'  ## 注意路径中的 双反斜杠
+# dump(results, local_file_path)
 
-# 创建S3客户端
-s3 = boto3.client('s3')
+# # 创建S3客户端
+# s3 = boto3.client('s3')
 
-# 指定桶名和S3中的文件路径
-bucket_name = 'your-s3-bucket-name'  # 替换为你的S3桶名
-s3_file_path = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_1s_k10.joblib'  # S3中的文件路径
+# # 指定桶名和S3中的文件路径
+# bucket_name = 'your-s3-bucket-name'  # 替换为你的S3桶名
+# s3_file_path = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_1s_k10.joblib'  # S3中的文件路径
 
-# 上传文件到S3
-s3.upload_file(local_file_path, bucket_name, s3_file_path)
+# # 上传文件到S3
+# s3.upload_file(local_file_path, bucket_name, s3_file_path)
 
 
 #%%
@@ -137,10 +137,10 @@ plt.savefig(img_data, format='png', bbox_inches='tight')
 img_data.seek(0)  # 移动到流的开始位置
 
 # 指定图像文件名
-# object_key = '30s/forecast_vs_actual(SARIMAX).png'
-# object_key = '60s/forecast_vs_actual(SARIMAX).png'
-# object_key = '300s/forecast_vs_actual(SARIMAX).png'
-object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/fc_(SARIMAX)_1s_k10.png'
+object_key = '30s/forecast_vs_actual(SARIMAX)_2.png'
+# object_key = '60s/forecast_vs_actual(SARIMAX)_2.png'
+# object_key = '300s/forecast_vs_actual(SARIMAX)_2.png'
+# object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/fc_(SARIMAX)_1s_k10.png'
 
 
 # 上传图像数据到S3
@@ -156,10 +156,10 @@ print(f"Image uploaded to S3: s3://{bucket_name}/{object_key}")
 comparison_df['avg_price'] = test['avg_price']
 # comparison_df.to_csv('E:/Bristol_tb2/mini_projectB/mini_projectB_sample_0129_2024/Problem B data/JPMorgan_Set01/LOBdata_process_weight/avg/sarimax_prediction_comparison.csv', index=True)
 ## 指定上传的文件名
-# object_key = '30s/sarimax_prediction_comparison.csv' 
-# object_key = '60s/sarimax_prediction_comparison.csv' 
-# object_key = '300s/sarimax_prediction_comparison.csv' 
-object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_1s_k10.csv'
+object_key = '30s/sarimax_prediction_comparison_2.csv' 
+# object_key = '60s/sarimax_prediction_comparison_2.csv' 
+# object_key = '300s/sarimax_prediction_comparison_2.csv' 
+# object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_1s_k10.csv'
 
 # 把DataFrame保存到一个字符串缓冲区中
 csv_buffer = StringIO()
@@ -202,7 +202,10 @@ print(f"MSE: {mse}, RMSE: {rmse}, MAE: {mae}, MAPE: {mape}")
 # print(f"AIC: {results.aic}, BIC: {results.bic}")   ## 
 
 ## 指定上传的文件名
-object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_evaluation_1s_k10.csv'
+object_key = '30s/SARIMAX_evaluation_2.csv' 
+# object_key = '60s/SARIMAX_evaluation_2.csv' 
+# object_key = '300s/SARIMAX_evaluation_2.csv' 
+# object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_evaluation_1s_k10.csv'
 
 # 把DataFrame保存到一个字符串缓冲区中
 csv_buffer = StringIO()
