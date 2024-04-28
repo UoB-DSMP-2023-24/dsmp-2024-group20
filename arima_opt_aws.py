@@ -10,8 +10,8 @@ s3_client = boto3.client('s3')
 
 bucket_name = 'lob-data-processed'
 # object_key = 'total_lob_30.csv'
-object_key = 'total_lob_60.csv'
-# object_key = 'total_lob_300.csv'
+# object_key = 'total_lob_60.csv'
+object_key = 'total_lob_300.csv'
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/total_lob_1s_k10_0.1.csv'
 
 obj = s3_client.get_object(Bucket=bucket_name, Key=object_key)
@@ -140,8 +140,8 @@ img_data.seek(0)  # 移动到流的开始位置
 
 # 指定图像文件名
 # object_key = '30s/forecast_vs_actual(SARIMAX)_2.png'
-object_key = '60s/forecast_vs_actual(SARIMAX)_2.png'
-# object_key = '300s/forecast_vs_actual(SARIMAX)_2.png'
+# object_key = '60s/forecast_vs_actual(SARIMAX)_2.png'
+object_key = '300s/forecast_vs_actual(SARIMAX)_2.png'
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/fc_(SARIMAX)_1s_k10.png'
 
 
@@ -205,8 +205,8 @@ print(f"MSE: {mse}, RMSE: {rmse}, MAE: {mae}, MAPE: {mape}")
 
 ## 指定上传的文件名
 # object_key = '30s/SARIMAX_evaluation_2.csv' 
-object_key = '60s/SARIMAX_evaluation_2.csv' 
-# object_key = '300s/SARIMAX_evaluation_2.csv' 
+# object_key = '60s/SARIMAX_evaluation_2.csv' 
+object_key = '300s/SARIMAX_evaluation_2.csv' 
 # object_key = 'whole-dataset/cleaned-dataset/time-window-1s/LOB/SARIMAX_evaluation_1s_k10.csv'
 
 # 把DataFrame保存到一个字符串缓冲区中
