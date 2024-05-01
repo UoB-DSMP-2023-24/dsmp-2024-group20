@@ -34,7 +34,7 @@ def process_lob_file(file_path):
             print(f"Error processing line: {line}. Error: {e}")
     ## bidsdf：使用处理过的数据列表创建一个Pandas DataFrame
     bidsdf = pd.DataFrame({'time': time,
-                           "bid_price": [i[0:number_of_prices] for i in bids],
+                           "bid_price": [i[0:number_of_prices] for i in bids],    ## bid_price: bid订单列表
                            "n_bid_prices": n,
                            "max_bid": m_price})
 
@@ -55,7 +55,7 @@ def process_lob_file(file_path):
             print(f"Error processing line: {line}. Error: {e}")
 
     asksdf = pd.DataFrame({'time': time,
-                           "ask_price": [i[0:number_of_prices] for i in asks],
+                           "ask_price": [i[0:number_of_prices] for i in asks],   ## ask_price: ask订单列表
                            "n_ask_price": n,
                            "min_ask": m_price})
     ## 使用Pandas的 merge 方法合并两个DataFrame，基于时间戳，并将时间转换为浮点型
