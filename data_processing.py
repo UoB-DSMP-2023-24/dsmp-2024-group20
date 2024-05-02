@@ -123,13 +123,14 @@ aggregation_rules = {
 }
 
 #%%
+
 # 遍历文件路径列表，处理每个文件
 for file_path in file_paths:
     original_file_name = os.path.basename(file_path)
     print("--------------Processing file:", original_file_name,"--------------")
     df = process_lob_file(file_path)
     df = before_agg_get_feature(df)
-    df = aggregate_data(df, 'time', aggregation_rules,5)
+    df = aggregate_data(df, 'time', aggregation_rules,1)
     df = after_agg_get_feature(df)
     df = mark_label(df,20,0.001)
 
@@ -143,6 +144,6 @@ for file_path in file_paths:
     # 处理完毕后的DataFrame可以进行保存或其他操作
     # 例如，保存到CSV文件
     df.to_csv(output_file_path, index=False)
-    # if True:
-    #     break
+    if True:
+        break
 print("--------------All files processed successfully!----------------")

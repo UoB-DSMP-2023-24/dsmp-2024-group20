@@ -11,15 +11,6 @@ from sklearn.metrics import classification_report
 import torch.nn.functional as F
 import shap
 
-
-seed_value = 1  # 你可以选择任何喜欢的种子值
-np.random.seed(seed_value)
-torch.manual_seed(seed_value)
-torch.cuda.manual_seed(seed_value)
-torch.cuda.manual_seed_all(seed_value)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-
 #%%
 
 class Attention(nn.Module):
@@ -124,15 +115,29 @@ def predict(model, test_loader):
             predictions.append(y_test_pred.numpy())
     return np.concatenate(predictions, axis=0)
 
+def mark_label(df,k,thresholds):
+    #0:stay,1:up，2:down
+    # df['m_minus'] = df['avg_price'].rolling(window=k).mean()
+    df['m_plus'] = df['avg_price'].shift(-1).rolling(window=k, min_periods=1).mean().shift(-k+1)
+    df['l_t'] = (df['m_plus'] - df['avg_price']) / df['avg_price']
+    df['label'] = 0
+    df.loc[df['l_t'] > thresholds, 'label'] = 1
+    df.loc[df['l_t'] < -thresholds, 'label'] = 2
+
+    return df
 
 #%%
-
-df = pd.read_csv('process_data_weight/UoB_Set01_2025-01-02LOBs.csv')
+from pandas import Timedelta
+df = pd.read_csv('process_data/total_lob_1.csv')
 df = df.dropna()
-# df = df.iloc[:5000]
-start_date = pd.to_datetime('2025-01-02 08:00:00')
-df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
-df.set_index('actual_datetime', inplace=True)
+# 将time_window列（秒数）转换为timedelta类型
+df['date'] = pd.to_datetime(df['date'])
+# 将时间窗口转换为timedelta（时间窗口以秒为单位），并设置每天的起始时间为8:00
+df['datetime'] = df['date'] + pd.to_timedelta('8 hours') + pd.to_timedelta(df['time_window'], unit='s')
+# 设置新的日期时间为索引
+df.set_index('datetime', inplace=True)
+
+
 df_index = df.index
 feature=df[['avg_price','avg_price_change', 'bid_level_diff', 'ask_level_diff',
              'bid_ask_depth_diff']]

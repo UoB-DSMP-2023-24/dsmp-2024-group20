@@ -102,6 +102,7 @@ def mark_label(df,k,thresholds):
 #%%
 # 指定文件夹路径
 input_path = 'C:/桌面/learning/s2/mini/JPMorgan_Set01/LOBs'
+tapes_path = 'C:/桌面/learning/s2/mini/JPMorgan_Set01/Tapes'
 output_path = 'process_data'
 # 获取文件夹内所有特定类型的文件，比如.txt文件
 file_paths = glob.glob(os.path.join(input_path, '*.txt'))  # 根据需要修改文件类型
@@ -131,21 +132,20 @@ for file_path in file_paths:
     print("--------------Processing file:", original_file_name,"--------------")
     df = process_lob_file(file_path)
     df = before_agg_get_feature(df)
-    df = aggregate_data(df, 'time', aggregation_rules,30)
+    df = aggregate_data(df, 'time', aggregation_rules,300)
     date_part = original_file_name.split('_')[2]  # 文件名格式: "UoB_Set01_2025-01-02LOBs.csv"
     date = date_part[:10]
     df['date'] = date
     df.insert(0, 'date', df.pop('date'))
     total_df = pd.concat([total_df, df], ignore_index=True)
-    # n+=1
-    # if n == 2:
-    #     break
-
+    if n == 0:
+        break
+#%%
 total_df = after_agg_get_feature(total_df)
-total_df = mark_label(total_df,20,0.001)
+total_df = mark_label(total_df,10,0.001)
 
 #%%
-new_file_name = 'total_lob.csv'
+new_file_name = 'test.csv'
 # 3. 构建新的文件路径
 output_file_path = os.path.join(output_path, new_file_name)
 # 处理完毕后的DataFrame可以进行保存或其他操作

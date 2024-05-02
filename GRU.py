@@ -102,7 +102,7 @@ def test_model(model, test_loader, criterion):
 
 #%%
 
-df = pd.read_csv('process_data_weight/UoB_Set01_2025-01-02LOBs.csv')
+df = pd.read_csv('process_data/UoB_Set01_2025-01-02LOBs.csv')
 df = df.dropna()
 # df = df.iloc[:5000]
 start_date = pd.to_datetime('2025-01-02 08:00:00')

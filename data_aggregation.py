@@ -27,13 +27,13 @@ def aggregate_data(df, second_column, aggregation_rules,second):
 
 
 #%%
-file_name = "UoB_Set01_2025-01-02LOBs.csv"
+file_name = "UoB_Set01_2025-01-02LOBs1.csv"
 df = pd.read_csv(file_name)
 # 定义聚合规则，例如: {'feature1': 'mean', 'feature2': 'sum'}
 # 可以根据需要添加新的特征和聚合规则
 aggregation_rules = {
     'avg_price': 'mean',  # 假设 avg_price 需要求平均值
-    'max_bid': 'max',  # 假设 max_bid 需要求最大值
+
 
 }
 aggregated_df = aggregate_data(df, 'time', aggregation_rules,5)

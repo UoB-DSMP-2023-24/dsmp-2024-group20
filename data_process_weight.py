@@ -131,9 +131,9 @@ for file_path in file_paths:
     print("--------------Processing file:", original_file_name,"--------------")
     df = process_lob_file(file_path)
     df = before_agg_get_feature(df)
-    df = aggregate_data(df, 'time', aggregation_rules,1)
+    df = aggregate_data(df, 'time', aggregation_rules,30)
     df = after_agg_get_feature(df)
-    df = mark_label(df,20,0.0001)
+    df = mark_label(df,20,0.001)
     new_file_name = os.path.splitext(original_file_name)[0] + '.csv'
     # 3. 构建新的文件路径
     output_file_path = os.path.join(output_path, new_file_name)

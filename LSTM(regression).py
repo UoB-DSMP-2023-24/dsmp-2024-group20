@@ -69,7 +69,8 @@ start_date = pd.to_datetime('2025-01-02 08:00:00')
 df['actual_datetime'] = start_date + pd.to_timedelta(df['time_window'], unit='s')
 df.set_index('actual_datetime', inplace=True)
 feature=df[['max_bid', 'min_ask', 'avg_price','avg_price_change',
-            'bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth', 'ask_cumulative_depth','bid_ask_depth_diff']]
+            'bid_level_diff', 'ask_level_diff', 'bid_cumulative_depth',
+            'ask_cumulative_depth','bid_ask_depth_diff']]
 target=df['l_t']
 
 scaler = StandardScaler()
@@ -111,14 +112,6 @@ train_model(model, train_loader, criterion, optimizer, num_epochs=10)
 
 # 预测
 predictions = predict(model, X_test_tensor)
-#%%
-import torch
-import torch.nn.functional as F
-
-
-# 计算均方误差
-mse = torch.mean((predictions - y_test_tensor.float()) ** 2)
-print("MSE:", mse.item())
 
 
 
