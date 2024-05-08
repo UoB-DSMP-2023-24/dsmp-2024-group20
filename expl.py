@@ -60,7 +60,6 @@ asksdf = pd.DataFrame({'time':time,
                        "min_ask":m_price})
 df = pd.merge(bidsdf,asksdf,on='time',how='outer').dropna()
 df['market_price'] = (df['max_bid']+df['min_ask'])/2
-#%%
 import numpy as np
 df['Duration'] = df['time'].astype(float).diff(1)
 df['maxbid_diff'] = df['max_bid'].astype(int).diff()
