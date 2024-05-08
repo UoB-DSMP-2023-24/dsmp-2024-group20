@@ -18,19 +18,11 @@ time = []
 n = []
 m_price = []
 for line in lob:
-    try:
-        if len(line)>3:
-            dt = ast.literal_eval('[['+list(line[3].split("]]]]]"))[0]+']]')
-            asks.append(dt)
-            time.append(line[0].split(',')[0][1:])
-            n.append(len(dt))
-            m_price.append(asks[len(asks)-1][0][0])
-    except Exception as e:
-        print(f"Error processing line: {line}. Error: {e}")
-        bids.append([[None]])
-        time.append(line[0].split(',')[0][1:])
-        n.append(0)
-        m_price.append(None)
+    print(f"Error processing line: {line}. Error: {e}")
+    bids.append([[None]])
+    time.append(line[0].split(',')[0][1:])
+    n.append(0)
+    m_price.append(None)
 asksdf = pd.DataFrame({'time':time,
                        "ask_price":[i[0:number_of_prices] for i in asks],
                        "n_ask_price":n,
