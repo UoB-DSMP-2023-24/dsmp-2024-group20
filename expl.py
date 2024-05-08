@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 20 17:01:38 2024
-
 @author: Vishal Chavan
 """
-
 import pandas as pd
 import json
 config = json.load(open("config.json"))
