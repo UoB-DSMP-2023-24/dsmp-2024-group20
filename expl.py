@@ -73,7 +73,6 @@ min_min_ask =  np.min(df['min_ask'])
 min_market_price = np.min(df['market_price'])
 min_bid_ask_depth_diff = np.min(df['bid_ask_depth_diff'])
 min_marketprice_diff = np.min(df['marketprice_diff'])
-#%%
 max_max_bid =  np.max(df['max_bid'])
 max_market_price = np.max(df['market_price'])
 max_bid_ask_depth_diff = np.max(df['bid_ask_depth_diff'])
