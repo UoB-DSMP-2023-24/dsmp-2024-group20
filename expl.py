@@ -13,7 +13,6 @@ with open(config['path']['LOB_test1'], 'r') as file:
         lob.append(list(line.split('[[')))
         if i == 10000:
             break
-#%%
 import ast
 bids = []
 time = []
