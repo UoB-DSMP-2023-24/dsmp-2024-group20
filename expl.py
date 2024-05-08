@@ -17,13 +17,6 @@ asks = []
 time = []
 n = []
 m_price = []
-asksdf = pd.DataFrame({'time':time,
-                       "ask_price":[i[0:number_of_prices] for i in asks],
-                       "n_ask_price":n,
-                       "min_ask":m_price})
-df = pd.merge(bidsdf,asksdf,on='time',how='outer').dropna()
-df['market_price'] = (df['max_bid']+df['min_ask'])/2
-import numpy as np
 df['Duration'] = df['time'].astype(float).diff(1)
 df['maxbid_diff'] = df['max_bid'].astype(int).diff()
 df['minask_diff'] = df['min_ask'].astype(int).diff()
