@@ -68,7 +68,6 @@ df['marketprice_diff'] = df['market_price'].astype(float).diff()
 df['bid_cumulative_depth'] = df['bid_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 df['ask_cumulative_depth'] = df['ask_price'].apply(lambda x: sum([i[1] for i in x]) if x else None)
 df['bid_ask_depth_diff'] = df['bid_cumulative_depth'] - df['ask_cumulative_depth']
-#%%
 min_min_ask =  np.min(df['min_ask'])
 min_market_price = np.min(df['market_price'])
 min_bid_ask_depth_diff = np.min(df['bid_ask_depth_diff'])
