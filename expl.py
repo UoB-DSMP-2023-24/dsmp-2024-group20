@@ -89,7 +89,6 @@ mean_max_bid =  np.mean(df['max_bid'])
 mean_market_price = np.mean(df['market_price'])
 mean_bid_ask_depth_diff = np.mean(df['bid_ask_depth_diff'])
 mean_marketprice_diff = np.mean(df['marketprice_diff'])
-#%%
 median_min_ask =  np.median(sorted(df['min_ask']))
 median_max_bid =  np.median(sorted(df['max_bid']))
 median_market_price = np.median(sorted(df['market_price']))
@@ -103,4 +102,3 @@ mode_bid_ask_depth_diff = stats.mode(sorted(df['bid_ask_depth_diff']))
 mode_marketprice_diff = stats.mode(sorted(df['marketprice_diff']))
 df_market_prices = df['market_price'].drop_duplicates(keep='first')
 df_durations = round(df['Duration'],3).drop_duplicates(keep='first')
-#%%
