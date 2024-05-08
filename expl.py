@@ -13,12 +13,6 @@ time = []
 n = []
 m_price=[]
 number_of_prices = 10
-for line in lob:
-    print(f"Error processing line: {line}. Error: {e}")
-    bids.append([[None]])
-    time.append(line[0].split(',')[0][1:])
-    n.append(0)
-    m_price.append(None)
 bidsdf = pd.DataFrame({'time':time,
                        "bid_price":[i[0:number_of_prices] for i in bids],
                        "n_bid_prices":n,
