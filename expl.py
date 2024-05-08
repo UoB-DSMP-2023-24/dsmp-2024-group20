@@ -14,19 +14,11 @@ n = []
 m_price=[]
 number_of_prices = 10
 for line in lob:
-    try:
-        if len(line)>2:
-            dt = ast.literal_eval('[['+list(line[2].split("]]], ['ask', "))[0]+']]')
-            bids.append(dt)
-            time.append(line[0].split(',')[0][1:])
-            n.append(len(dt))
-            m_price.append(bids[len(bids)-1][0][0])
-    except Exception as e:
-        print(f"Error processing line: {line}. Error: {e}")
-        bids.append([[None]])
-        time.append(line[0].split(',')[0][1:])
-        n.append(0)
-        m_price.append(None)
+    print(f"Error processing line: {line}. Error: {e}")
+    bids.append([[None]])
+    time.append(line[0].split(',')[0][1:])
+    n.append(0)
+    m_price.append(None)
 bidsdf = pd.DataFrame({'time':time,
                        "bid_price":[i[0:number_of_prices] for i in bids],
                        "n_bid_prices":n,
