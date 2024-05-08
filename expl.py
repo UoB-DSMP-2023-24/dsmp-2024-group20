@@ -6,7 +6,6 @@ Created on Tue Feb 20 17:01:38 2024
 import pandas as pd
 import json
 config = json.load(open("config.json"))
-#%%
 lob = []
 with open(config['path']['LOB_test1'], 'r') as file:
     for i, line in enumerate(file):
