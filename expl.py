@@ -37,7 +37,6 @@ bidsdf = pd.DataFrame({'time':time,
                        "bid_price":[i[0:number_of_prices] for i in bids],
                        "n_bid_prices":n,
                        "max_bid":m_price})
-#%%
 asks = []
 time = []
 n = []
